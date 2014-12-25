@@ -1,16 +1,33 @@
 package request
 
 import (
-	// "io"
+	"github.com/bitly/go-simplejson"
+	"io/ioutil"
+	"log"
 	"net/http"
-	// "net/url"
 )
 
-type Request http.Request
+type Client struct {
+	http.Client
+}
 
-type Response http.Response
+type Request struct {
+	*http.Request
+}
 
-func (resp *Response) OK() bool {
+type Response struct {
+	*http.Response
+}
+
+func (resp *Response) Json() (*simplejson.Json, error) {
+	s, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return simplejson.NewJson(s)
+}
+
+func (resp *Response) Ok() bool {
 	return resp.StatusCode < 400
 }
 
@@ -19,6 +36,7 @@ func (resp *Response) Reason() string {
 }
 
 type Args struct {
+	Client  *Client
 	Headers map[string]string
 	Cookies map[string]string
 	Data    map[string]string
@@ -26,37 +44,41 @@ type Args struct {
 	Files   map[string]string
 }
 
-var headers = map[string]string{
+var defaultHeaders = map[string]string{
 	"Connection":      "keep-alive",
 	"Accept-Encoding": "gzip, deflate",
 	"Accept":          "*/*",
 	"User-Agent":      "go-request/0.1.0",
 }
 
-func NewArgs() *Args {
+func NewArgs(c *Client) *Args {
 	return &Args{
-		Headers: headers,
+		Client:  c,
+		Headers: defaultHeaders,
 	}
 }
 
-func newRequest(method string, url string, a *Args) (resp *http.Response, err error) {
-	client := &http.Client{}
-	req, _ := http.NewRequest(method, url, nil)
+func newRequest(method string, url string, a *Args) (resp *Response, err error) {
+	client := a.Client
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 	for k, v := range a.Headers {
 		req.Header.Set(k, v)
 	}
-	resp, err = client.Do(req)
+	s, err := client.Do(req)
+	resp = &Response{s}
 	return
 }
 
 func Get(url string, a *Args) (resp *Response, err error) {
-	s, err := newRequest("GET", url, a)
-	resp = (*Response)(s)
+	resp, err = newRequest("GET", url, a)
 	return
 }
 
 func Head(url string, a *Args) (resp *Response, err error) {
-	s, err := newRequest("HEAD", url, a)
-	resp = (*Response)(s)
+	resp, err = newRequest("HEAD", url, a)
 	return
 }

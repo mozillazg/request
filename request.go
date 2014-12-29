@@ -54,6 +54,12 @@ func (resp *Response) Content() (b []byte, err error) {
 	return b, err
 }
 
+func (resp *Response) Text() (string, error) {
+	b, err := resp.Content()
+	s := string(b)
+	return s, err
+}
+
 func (resp *Response) Ok() bool {
 	return resp.StatusCode < 400
 }

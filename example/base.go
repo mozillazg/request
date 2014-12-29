@@ -57,8 +57,8 @@ func gzip(a *request.Args) {
 	}
 	fmt.Println(d.Get("headers").Get("Accept-Encoding"))
 	fmt.Println(resp.Header.Get("Content-Encoding"))
-	b, err := resp.Content()
-	fmt.Println(string(b))
+	s, err := resp.Text()
+	fmt.Println(s)
 	defer resp.Body.Close()
 }
 

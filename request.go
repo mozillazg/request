@@ -1,15 +1,15 @@
 package request
 
 import (
-	"github.com/bitly/go-simplejson"
+	"compress/gzip"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
-
-type Client struct {
-	http.Client
-}
+import (
+	"github.com/bitly/go-simplejson"
+)
 
 type Request struct {
 	*http.Request
@@ -17,14 +17,41 @@ type Request struct {
 
 type Response struct {
 	*http.Response
+	content []byte
 }
 
 func (resp *Response) Json() (*simplejson.Json, error) {
-	s, err := ioutil.ReadAll(resp.Body)
+	b, err := resp.Content()
 	if err != nil {
 		return nil, err
 	}
-	return simplejson.NewJson(s)
+	return simplejson.NewJson(b)
+}
+
+func (resp *Response) Content() (b []byte, err error) {
+	if resp.content != nil {
+		return resp.content, nil
+	}
+
+	var reader io.ReadCloser
+	switch resp.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		b, err = ioutil.ReadAll(reader)
+		defer reader.Close()
+	default:
+		reader = resp.Body
+		b, err = ioutil.ReadAll(reader)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	resp.content = b
+	return b, err
 }
 
 func (resp *Response) Ok() bool {
@@ -36,7 +63,7 @@ func (resp *Response) Reason() string {
 }
 
 type Args struct {
-	Client  *Client
+	Client  *http.Client
 	Headers map[string]string
 	Cookies map[string]string
 	Data    map[string]string
@@ -51,7 +78,7 @@ var defaultHeaders = map[string]string{
 	"User-Agent":      "go-request/0.1.0",
 }
 
-func NewArgs(c *Client) *Args {
+func NewArgs(c *http.Client) *Args {
 	return &Args{
 		Client:  c,
 		Headers: defaultHeaders,
@@ -69,7 +96,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 		req.Header.Set(k, v)
 	}
 	s, err := client.Do(req)
-	resp = &Response{s}
+	resp = &Response{s, nil}
 	return
 }
 

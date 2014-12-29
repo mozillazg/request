@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/mozillazg/request"
+	"net/http"
 )
 
-func get(c *request.Client, a *request.Args) {
+func get(a *request.Args) {
 	resp, err := request.Get("http://httpbin.org/get", a)
 	defer resp.Body.Close()
 	if err == nil {
@@ -14,7 +15,7 @@ func get(c *request.Client, a *request.Args) {
 	}
 }
 
-func head(c *request.Client, a *request.Args) {
+func head(a *request.Args) {
 	resp, err := request.Head("http://httpbin.org/get", a)
 	if err == nil {
 		fmt.Println(resp.Ok())
@@ -30,7 +31,7 @@ type body struct {
 	url     string
 }
 
-func json(c *request.Client, a *request.Args) {
+func json(a *request.Args) {
 	resp, err := request.Get("http://httpbin.org/get", a)
 	if err != nil {
 		return
@@ -44,12 +45,33 @@ func json(c *request.Client, a *request.Args) {
 	defer resp.Body.Close()
 }
 
+func gzip(a *request.Args) {
+	resp, err := request.Get("http://httpbin.org/gzip", a)
+	if err != nil {
+		return
+	}
+
+	d, err := resp.Json()
+	if err != nil {
+		return
+	}
+	fmt.Println(d.Get("headers").Get("Accept-Encoding"))
+	fmt.Println(resp.Header.Get("Content-Encoding"))
+	b, err := resp.Content()
+	fmt.Println(string(b))
+	defer resp.Body.Close()
+}
+
 func main() {
-	c := &request.Client{}
+	c := &http.Client{}
 	a := request.NewArgs(c)
 
-	// get(c, a)
-	// head(c, a)
-	json(c, a)
-
+	// fmt.Println("=====GET: ")
+	// get(a)
+	// fmt.Println("=====HEAD: ")
+	// head(a)
+	// fmt.Println("=====JSON: ")
+	// json(a)
+	fmt.Println("=====GZIP: ")
+	gzip(a)
 }

@@ -91,6 +91,16 @@ func customHeaders(a *request.Args) {
 	fmt.Println(d.Get("headers").Get("Accept"))
 }
 
+func put(a *request.Args) {
+	resp, _ := request.Put("http://httpbin.org/put", a)
+	defer resp.Body.Close()
+
+	fmt.Println(resp.Ok())
+	d, _ := resp.Json()
+	fmt.Println(d.Get("headers").Get("Content-Type"))
+	fmt.Println(d.Get("form"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
@@ -111,7 +121,13 @@ func main() {
 	// fmt.Println("=====POST: ")
 	// post(a)
 
-	fmt.Println("=====Custom Headers: ")
-	customHeaders(a)
+	// fmt.Println("=====Custom Headers: ")
+	// customHeaders(a)
 
+	a.Data = map[string]string{
+		"key": "value",
+		"a":   "123",
+	}
+	fmt.Println("=====PUT: ")
+	put(a)
 }

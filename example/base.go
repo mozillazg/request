@@ -72,6 +72,25 @@ func post(a *request.Args) {
 	fmt.Println(d.Get("form"))
 }
 
+func customHeaders(a *request.Args) {
+	a.Headers = map[string]string{
+		"Accept-Encoding": "gzip,deflate,sdch",
+		"Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+	}
+	resp, err := request.Get("http://httpbin.org/get", a)
+	defer resp.Body.Close()
+	if err == nil {
+		fmt.Println(resp.Ok())
+	}
+	d, err := resp.Json()
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Println(d.Get("headers").Get("User-Agent"))
+	fmt.Println(d.Get("headers").Get("Accept-Encoding"))
+	fmt.Println(d.Get("headers").Get("Accept"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
@@ -85,10 +104,14 @@ func main() {
 	// fmt.Println("=====GZIP: ")
 	// gzip(a)
 
-	a.Data = map[string]string{
-		"key": "value",
-		"a":   "123",
-	}
-	fmt.Println("=====POST: ")
-	post(a)
+	// a.Data = map[string]string{
+	// 	"key": "value",
+	// 	"a":   "123",
+	// }
+	// fmt.Println("=====POST: ")
+	// post(a)
+
+	fmt.Println("=====Custom Headers: ")
+	customHeaders(a)
+
 }

@@ -89,30 +89,40 @@ var defaultBodyType = "application/x-www-form-urlencoded"
 
 func NewArgs(c *http.Client) *Args {
 	return &Args{
-		c, defaultHeaders, nil, nil, nil, nil,
+		Client:  c,
+		Headers: defaultHeaders,
+		Cookies: nil,
+		Data:    nil,
+		Params:  nil,
+		Files:   nil,
 	}
 }
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
-
-	if a.Data != nil {
-
-	}
-
 	body := newBody(a.Data)
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	// apply defaultHeaders
+	for k, v := range defaultHeaders {
+		_, ok := a.Headers[k]
+		if !ok {
+			req.Header.Set(k, v)
+		}
+	}
+	// apply custom Headers
 	for k, v := range a.Headers {
 		req.Header.Set(k, v)
 	}
+	// apply "Content-Type" Headers
 	_, ok := a.Headers["Content-Type"]
 	if !ok && method == "POST" {
 		req.Header.Set("Content-Type", defaultBodyType)
 	}
+
 	s, err := client.Do(req)
 	resp = &Response{s, nil}
 	return

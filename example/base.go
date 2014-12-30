@@ -13,6 +13,9 @@ func get(a *request.Args) {
 		fmt.Println(resp.Ok())
 		fmt.Println(resp.Reason())
 	}
+	d, _ := resp.Json()
+	fmt.Println(d.Get("url"))
+	fmt.Println(d.Get("args"))
 }
 
 func head(a *request.Args) {
@@ -129,6 +132,18 @@ func options(a *request.Args) {
 	fmt.Println("Allow:", resp.Header.Get("Allow"))
 }
 
+func getParams(a *request.Args) {
+	resp, err := request.Get("http://httpbin.org/get?foobar=123", a)
+	defer resp.Body.Close()
+	if err == nil {
+		fmt.Println(resp.Ok())
+		fmt.Println(resp.Reason())
+	}
+	d, _ := resp.Json()
+	fmt.Println(d.Get("url"))
+	fmt.Println(d.Get("args"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
@@ -165,4 +180,13 @@ func main() {
 	deleteF(a)
 	fmt.Println("=====OPTIONS: ")
 	options(a)
+
+	a = request.NewArgs(c)
+	a.Params = map[string]string{
+		"a":   "abc",
+		"key": "value",
+	}
+	fmt.Println("=====Params: ")
+	get(a)
+	getParams(a)
 }

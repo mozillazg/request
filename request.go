@@ -98,10 +98,38 @@ func NewArgs(c *http.Client) *Args {
 	}
 }
 
+func newBody(data map[string]string) (body io.Reader) {
+	if data == nil {
+		return nil
+	}
+
+	d := url.Values{}
+	for k, v := range data {
+		d.Set(k, v)
+	}
+	return strings.NewReader(d.Encode())
+}
+
+func newURL(u string, params map[string]string) string {
+	if params == nil {
+		return u
+	}
+
+	p := url.Values{}
+	for k, v := range params {
+		p.Set(k, v)
+	}
+	if strings.Contains(u, "?") {
+		return u + "&" + p.Encode()
+	}
+	return u + "?" + p.Encode()
+}
+
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
 	body := newBody(a.Data)
-	req, err := http.NewRequest(method, url, body)
+	fullURL := newURL(url, a.Params)
+	req, err := http.NewRequest(method, fullURL, body)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -126,18 +154,6 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	s, err := client.Do(req)
 	resp = &Response{s, nil}
 	return
-}
-
-func newBody(data map[string]string) (body io.Reader) {
-	if data == nil {
-		return nil
-	}
-
-	d := url.Values{}
-	for k, v := range data {
-		d.Set(k, v)
-	}
-	return strings.NewReader(d.Encode())
 }
 
 func Get(url string, a *Args) (resp *Response, err error) {

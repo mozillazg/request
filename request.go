@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 )
 import (
 	"github.com/bitly/go-simplejson"
@@ -83,17 +85,23 @@ var defaultHeaders = map[string]string{
 	"Accept":          "*/*",
 	"User-Agent":      "go-request/0.1.0",
 }
+var defaultBodyType = "application/x-www-form-urlencoded"
 
 func NewArgs(c *http.Client) *Args {
 	return &Args{
-		Client:  c,
-		Headers: defaultHeaders,
+		c, defaultHeaders, nil, nil, nil, nil,
 	}
 }
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
-	req, err := http.NewRequest(method, url, nil)
+
+	if a.Data != nil {
+
+	}
+
+	body := newBody(a.Data)
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -101,9 +109,25 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	for k, v := range a.Headers {
 		req.Header.Set(k, v)
 	}
+	_, ok := a.Headers["Content-Type"]
+	if !ok && method == "POST" {
+		req.Header.Set("Content-Type", defaultBodyType)
+	}
 	s, err := client.Do(req)
 	resp = &Response{s, nil}
 	return
+}
+
+func newBody(data map[string]string) (body io.Reader) {
+	if data == nil {
+		return nil
+	}
+
+	d := url.Values{}
+	for k, v := range data {
+		d.Set(k, v)
+	}
+	return strings.NewReader(d.Encode())
 }
 
 func Get(url string, a *Args) (resp *Response, err error) {
@@ -113,5 +137,10 @@ func Get(url string, a *Args) (resp *Response, err error) {
 
 func Head(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("HEAD", url, a)
+	return
+}
+
+func Post(url string, a *Args) (resp *Response, err error) {
+	resp, err = newRequest("POST", url, a)
 	return
 }

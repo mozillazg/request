@@ -24,13 +24,6 @@ func head(a *request.Args) {
 	defer resp.Body.Close()
 }
 
-type body struct {
-	args    map[string]string
-	headers map[string]string
-	origin  string
-	url     string
-}
-
 func json(a *request.Args) {
 	resp, err := request.Get("http://httpbin.org/get", a)
 	if err != nil {
@@ -62,6 +55,23 @@ func gzip(a *request.Args) {
 	defer resp.Body.Close()
 }
 
+func post(a *request.Args) {
+	resp, err := request.Post("http://httpbin.org/post", a)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	fmt.Println(resp.Ok())
+	d, err := resp.Json()
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Println(d.Get("headers").Get("Content-Type"))
+	fmt.Println(d.Get("form"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
@@ -72,6 +82,13 @@ func main() {
 	// head(a)
 	// fmt.Println("=====JSON: ")
 	// json(a)
-	fmt.Println("=====GZIP: ")
-	gzip(a)
+	// fmt.Println("=====GZIP: ")
+	// gzip(a)
+
+	a.Data = map[string]string{
+		"key": "value",
+		"a":   "123",
+	}
+	fmt.Println("=====POST: ")
+	post(a)
 }

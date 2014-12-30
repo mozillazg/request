@@ -101,33 +101,68 @@ func put(a *request.Args) {
 	fmt.Println(d.Get("form"))
 }
 
+func patch(a *request.Args) {
+	resp, _ := request.Patch("http://httpbin.org/patch", a)
+	defer resp.Body.Close()
+
+	fmt.Println(resp.Ok())
+	d, _ := resp.Json()
+	fmt.Println(d.Get("headers").Get("Content-Type"))
+	fmt.Println(d.Get("form"))
+}
+
+func deleteF(a *request.Args) {
+	resp, _ := request.Delete("http://httpbin.org/delete", a)
+	defer resp.Body.Close()
+
+	fmt.Println(resp.Ok())
+	d, _ := resp.Json()
+	fmt.Println(d.Get("headers").Get("Content-Type"))
+	fmt.Println(d.Get("form"))
+}
+
+func options(a *request.Args) {
+	resp, _ := request.Options("http://httpbin.org/get", a)
+	defer resp.Body.Close()
+
+	fmt.Println(resp.Ok())
+	fmt.Println("Allow:", resp.Header.Get("Allow"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 
-	// fmt.Println("=====GET: ")
-	// get(a)
-	// fmt.Println("=====HEAD: ")
-	// head(a)
-	// fmt.Println("=====JSON: ")
-	// json(a)
-	// fmt.Println("=====GZIP: ")
-	// gzip(a)
+	fmt.Println("=====GET: ")
+	get(a)
+	fmt.Println("=====HEAD: ")
+	head(a)
+	fmt.Println("=====JSON: ")
+	json(a)
+	fmt.Println("=====GZIP: ")
+	gzip(a)
 
-	// a.Data = map[string]string{
-	// 	"key": "value",
-	// 	"a":   "123",
-	// }
-	// fmt.Println("=====POST: ")
-	// post(a)
+	a.Data = map[string]string{
+		"key": "value",
+		"a":   "123",
+	}
+	fmt.Println("=====POST: ")
+	post(a)
 
-	// fmt.Println("=====Custom Headers: ")
-	// customHeaders(a)
+	fmt.Println("=====Custom Headers: ")
+	customHeaders(a)
 
+	a = request.NewArgs(c)
 	a.Data = map[string]string{
 		"key": "value",
 		"a":   "123",
 	}
 	fmt.Println("=====PUT: ")
 	put(a)
+	fmt.Println("=====PATCH: ")
+	patch(a)
+	fmt.Println("=====DELTE: ")
+	deleteF(a)
+	fmt.Println("=====OPTIONS: ")
+	options(a)
 }

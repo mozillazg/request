@@ -120,11 +120,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	// apply "Content-Type" Headers
 	_, ok := a.Headers["Content-Type"]
 	if !ok {
-		switch method {
-		case "POST":
-		case "PUT":
-			req.Header.Set("Content-Type", defaultBodyType)
-		}
+		req.Header.Set("Content-Type", defaultBodyType)
 	}
 
 	s, err := client.Do(req)
@@ -161,5 +157,20 @@ func Post(url string, a *Args) (resp *Response, err error) {
 
 func Put(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PUT", url, a)
+	return
+}
+
+func Patch(url string, a *Args) (resp *Response, err error) {
+	resp, err = newRequest("PATCH", url, a)
+	return
+}
+
+func Delete(url string, a *Args) (resp *Response, err error) {
+	resp, err = newRequest("DELETE", url, a)
+	return
+}
+
+func Options(url string, a *Args) (resp *Response, err error) {
+	resp, err = newRequest("OPTIONS", url, a)
 	return
 }

@@ -22,38 +22,29 @@ j, err := resp.Json()
 **POST**:
 
 ```go
-c := &http.Client{}
-a := request.NewArgs(c)
 a.Data = map[string]string{
 	"key": "value",
 	"a":   "123",
 }
 resp, err := request.Post("http://httpbin.org/post", a)
-j, err := resp.Json()
 ```
 
 **Cookies**:
 
 ```go
-c := &http.Client{}
-a := request.NewArgs(c)
 a.Cookies = map[string]string{
 	"key": "value",
 	"a":   "123",
 }
 resp, err := request.Get("http://httpbin.org/cookies", a)
-j, err := resp.Json()
 ```
 
 **Headers**:
 
 ```go
-c := &http.Client{}
-a := request.NewArgs(c)
 a.Headers = map[string]string{
   "Accept-Encoding": "gzip,deflate,sdch",
-  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", 
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 }
-resp, err := request.Get("http://httpbin.org/gzip", a)
-j, err := resp.Json()
+resp, err := request.Get("http://httpbin.org/get", a)
 ```

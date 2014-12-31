@@ -14,9 +14,9 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-type Request struct {
-	*http.Request
-}
+// type Request struct {
+// 	*http.Request
+// }
 
 type Response struct {
 	*http.Response
@@ -77,7 +77,7 @@ type Args struct {
 	Cookies map[string]string
 	Data    map[string]string
 	Params  map[string]string
-	Files   map[string]string
+	Files   map[string][]byte
 }
 
 var defaultHeaders = map[string]string{
@@ -107,16 +107,23 @@ func NewArgs(c *http.Client) *Args {
 	}
 }
 
-func newBody(data map[string]string) (body io.Reader) {
-	if data == nil {
-		return nil
+func applyHeaders(a *Args, req *http.Request) {
+	// apply defaultHeaders
+	for k, v := range defaultHeaders {
+		_, ok := a.Headers[k]
+		if !ok {
+			req.Header.Set(k, v)
+		}
 	}
-
-	d := url.Values{}
-	for k, v := range data {
-		d.Set(k, v)
+	// apply custom Headers
+	for k, v := range a.Headers {
+		req.Header.Set(k, v)
 	}
-	return strings.NewReader(d.Encode())
+	// apply "Content-Type" Headers
+	_, ok := a.Headers["Content-Type"]
+	if !ok {
+		req.Header.Set("Content-Type", defaultBodyType)
+	}
 }
 
 func newURL(u string, params map[string]string) string {
@@ -134,6 +141,18 @@ func newURL(u string, params map[string]string) string {
 	return u + "?" + p.Encode()
 }
 
+func newBody(data map[string]string) (body io.Reader) {
+	if data == nil {
+		return nil
+	}
+
+	d := url.Values{}
+	for k, v := range data {
+		d.Set(k, v)
+	}
+	return strings.NewReader(d.Encode())
+}
+
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
 	body := newBody(a.Data)
@@ -143,22 +162,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 		log.Fatal(err)
 		return
 	}
-	// apply defaultHeaders
-	for k, v := range defaultHeaders {
-		_, ok := a.Headers[k]
-		if !ok {
-			req.Header.Set(k, v)
-		}
-	}
-	// apply custom Headers
-	for k, v := range a.Headers {
-		req.Header.Set(k, v)
-	}
-	// apply "Content-Type" Headers
-	_, ok := a.Headers["Content-Type"]
-	if !ok {
-		req.Header.Set("Content-Type", defaultBodyType)
-	}
+	applyHeaders(a, req)
 
 	s, err := client.Do(req)
 	resp = &Response{s, nil}

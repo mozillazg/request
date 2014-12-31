@@ -16,7 +16,7 @@ install:
   - go build
 
 script:
-  - go run examle/base.go
+  - go run example/base.go
   # - $HOME/gopath/bin/goveralls -repotoken WAzmh3gmiQEUYEHM2wkwSH4oTrshvMmll
 
 notifications:

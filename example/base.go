@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/mozillazg/request"
 	"net/http"
+
+	"github.com/mozillazg/request"
 )
 
 func get(a *request.Args) {
@@ -146,50 +147,69 @@ func getParams(a *request.Args) {
 	fmt.Println(d.Get("args"))
 }
 
+func cookies(a *request.Args) {
+	resp, _ := request.Get("http://httpbin.org/cookies", a)
+	defer resp.Body.Close()
+	d, _ := resp.Json()
+	fmt.Println(d.Get("cookies"))
+	fmt.Println(resp.Cookies())
+	url := resp.Request.URL
+	fmt.Println(a.Client.Jar.Cookies(url))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
+	//
+	// fmt.Println("=====GET: ")
+	// get(a)
+	// fmt.Println("=====HEAD: ")
+	// head(a)
+	// fmt.Println("=====JSON: ")
+	// json(a)
+	// fmt.Println("=====GZIP: ")
+	// gzip(a)
+	//
+	// a.Data = map[string]string{
+	// 	"key": "value",
+	// 	"a":   "123",
+	// }
+	// fmt.Println("=====POST: ")
+	// post(a)
+	//
+	// fmt.Println("=====Custom Headers: ")
+	// customHeaders(a)
+	//
+	// a = request.NewArgs(c)
+	// a.Data = map[string]string{
+	// 	"key": "value",
+	// 	"a":   "123",
+	// }
+	// fmt.Println("=====PUT: ")
+	// put(a)
+	// fmt.Println("=====PATCH: ")
+	// patch(a)
+	// fmt.Println("=====DELTE: ")
+	// deleteF(a)
+	// fmt.Println("=====OPTIONS: ")
+	// options(a)
+	//
+	// a = request.NewArgs(c)
+	// a.Params = map[string]string{
+	// 	"a":   "abc",
+	// 	"key": "value",
+	// }
+	// fmt.Println("=====Params: ")
+	// get(a)
+	// getParams(a)
+	// post(a)
 
-	fmt.Println("=====GET: ")
-	get(a)
-	fmt.Println("=====HEAD: ")
-	head(a)
-	fmt.Println("=====JSON: ")
-	json(a)
-	fmt.Println("=====GZIP: ")
-	gzip(a)
-
-	a.Data = map[string]string{
-		"key": "value",
-		"a":   "123",
-	}
-	fmt.Println("=====POST: ")
-	post(a)
-
-	fmt.Println("=====Custom Headers: ")
-	customHeaders(a)
-
+	fmt.Println("=====Cookies: ")
 	a = request.NewArgs(c)
-	a.Data = map[string]string{
-		"key": "value",
-		"a":   "123",
+	cookies(a)
+	a.Cookies = map[string]string{
+		"name": "value",
+		"foo":  "bar",
 	}
-	fmt.Println("=====PUT: ")
-	put(a)
-	fmt.Println("=====PATCH: ")
-	patch(a)
-	fmt.Println("=====DELTE: ")
-	deleteF(a)
-	fmt.Println("=====OPTIONS: ")
-	options(a)
-
-	a = request.NewArgs(c)
-	a.Params = map[string]string{
-		"a":   "abc",
-		"key": "value",
-	}
-	fmt.Println("=====Params: ")
-	get(a)
-	getParams(a)
-	post(a)
+	cookies(a)
 }

@@ -126,6 +126,17 @@ func applyHeaders(a *Args, req *http.Request) {
 	}
 }
 
+func applyCookies(a *Args, req *http.Request) {
+	if a.Cookies == nil {
+		return
+	}
+	cookies := a.Client.Jar.Cookies(req.URL)
+	for k, v := range a.Cookies {
+		cookies = append(cookies, &http.Cookie{Name: k, Value: v})
+	}
+	a.Client.Jar.SetCookies(req.URL, cookies)
+}
+
 func newURL(u string, params map[string]string) string {
 	if params == nil {
 		return u
@@ -163,6 +174,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 		return
 	}
 	applyHeaders(a, req)
+	applyCookies(a, req)
 
 	s, err := client.Do(req)
 	resp = &Response{s, nil}

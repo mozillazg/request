@@ -16,6 +16,7 @@ install:
   - go build
 
 script:
+  - echo "test.txtabc" > test.txt
   - go run example/base.go
   # - $HOME/gopath/bin/goveralls -repotoken WAzmh3gmiQEUYEHM2wkwSH4oTrshvMmll
 

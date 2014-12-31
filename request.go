@@ -168,16 +168,17 @@ func newURL(u string, params map[string]string) string {
 
 func newMultipartBody(a *Args) (body io.Reader, contentType string, err error) {
 	files := a.Files
-	file := files[0]
 	bodyBuffer := new(bytes.Buffer)
 	bodyWriter := multipart.NewWriter(bodyBuffer)
-	fileWriter, err := bodyWriter.CreateFormFile(file.FieldName, file.FileName)
-	if err != nil {
-		return nil, "", err
-	}
-	_, err = io.Copy(fileWriter, file.File)
-	if err != nil {
-		return nil, "", err
+	for _, file := range files {
+		fileWriter, err := bodyWriter.CreateFormFile(file.FieldName, file.FileName)
+		if err != nil {
+			return nil, "", err
+		}
+		_, err = io.Copy(fileWriter, file.File)
+		if err != nil {
+			return nil, "", err
+		}
 	}
 	if a.Data != nil {
 		for k, v := range a.Data {
@@ -185,8 +186,8 @@ func newMultipartBody(a *Args) (body io.Reader, contentType string, err error) {
 		}
 	}
 	contentType = bodyWriter.FormDataContentType()
-	body = bodyBuffer
 	defer bodyWriter.Close()
+	body = bodyBuffer
 	return
 }
 

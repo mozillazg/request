@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/mozillazg/request"
 )
@@ -166,6 +167,7 @@ func file(a *request.Args) {
 	d, _ := resp.Json()
 	fmt.Println(d.Get("url"))
 	fmt.Println(d.Get("files"))
+	fmt.Println(d.Get("form"))
 }
 
 func files(a *request.Args) {
@@ -245,8 +247,20 @@ func main() {
 	}
 	_, _ = w.Write(f)
 	w.Flush()
+	f2, _ := os.Open("test.txt")
+
+	a.Data = map[string]string{
+		"key": "value",
+		"a":   "123",
+	}
 	a.Files = []request.FileField{
-		request.FileField{"a", "a.txt", b},
+		request.FileField{"abc", "abc.txt", b},
+		request.FileField{"test", "test.txt", f2},
+	}
+	file(a)
+	f2, _ = os.Open("test.txt")
+	a.Files = []request.FileField{
+		request.FileField{"abc", "abc.txt", f2},
 	}
 	file(a)
 }

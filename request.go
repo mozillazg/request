@@ -6,11 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"strings"
-)
-import (
+
 	"github.com/bitly/go-simplejson"
+	"golang.org/x/net/publicsuffix"
 )
 
 type Request struct {
@@ -88,6 +89,14 @@ var defaultHeaders = map[string]string{
 var defaultBodyType = "application/x-www-form-urlencoded"
 
 func NewArgs(c *http.Client) *Args {
+	if c.Jar == nil {
+		options := cookiejar.Options{
+			PublicSuffixList: publicsuffix.List,
+		}
+		jar, _ := cookiejar.New(&options)
+		c.Jar = jar
+	}
+
 	return &Args{
 		Client:  c,
 		Headers: defaultHeaders,
@@ -128,8 +137,8 @@ func newURL(u string, params map[string]string) string {
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
 	body := newBody(a.Data)
-	fullURL := newURL(url, a.Params)
-	req, err := http.NewRequest(method, fullURL, body)
+	u := newURL(url, a.Params)
+	req, err := http.NewRequest(method, u, body)
 	if err != nil {
 		log.Fatal(err)
 		return

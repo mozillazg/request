@@ -73,6 +73,8 @@ func post(a *request.Args) {
 	}
 	fmt.Println(d.Get("headers").Get("Content-Type"))
 	fmt.Println(d.Get("form"))
+	fmt.Println(d.Get("url"))
+	fmt.Println(d.Get("args"))
 }
 
 func customHeaders(a *request.Args) {
@@ -189,4 +191,5 @@ func main() {
 	fmt.Println("=====Params: ")
 	get(a)
 	getParams(a)
+	post(a)
 }

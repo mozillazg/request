@@ -14,6 +14,8 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+const Version = "0.1.0"
+
 // type Request struct {
 // 	*http.Request
 // }
@@ -84,7 +86,7 @@ var defaultHeaders = map[string]string{
 	"Connection":      "keep-alive",
 	"Accept-Encoding": "gzip, deflate",
 	"Accept":          "*/*",
-	"User-Agent":      "go-request/0.1.0",
+	"User-Agent":      "go-request/" + Version,
 }
 var defaultBodyType = "application/x-www-form-urlencoded"
 

@@ -1,10 +1,12 @@
 package request
 
 import (
+	"bytes"
 	"compress/gzip"
 	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -73,13 +75,19 @@ func (resp *Response) Reason() string {
 	return resp.Status
 }
 
+type FileField struct {
+	FieldName string
+	FileName  string
+	File      io.Reader
+}
+
 type Args struct {
 	Client  *http.Client
 	Headers map[string]string
 	Cookies map[string]string
 	Data    map[string]string
 	Params  map[string]string
-	Files   map[string][]byte
+	Files   []FileField
 }
 
 var defaultHeaders = map[string]string{
@@ -109,7 +117,7 @@ func NewArgs(c *http.Client) *Args {
 	}
 }
 
-func applyHeaders(a *Args, req *http.Request) {
+func applyHeaders(a *Args, req *http.Request, contentType string) {
 	// apply defaultHeaders
 	for k, v := range defaultHeaders {
 		_, ok := a.Headers[k]
@@ -124,7 +132,11 @@ func applyHeaders(a *Args, req *http.Request) {
 	// apply "Content-Type" Headers
 	_, ok := a.Headers["Content-Type"]
 	if !ok {
-		req.Header.Set("Content-Type", defaultBodyType)
+		if contentType != "" {
+			req.Header.Set("Content-Type", contentType)
+		} else {
+			req.Header.Set("Content-Type", defaultBodyType)
+		}
 	}
 }
 
@@ -154,28 +166,57 @@ func newURL(u string, params map[string]string) string {
 	return u + "?" + p.Encode()
 }
 
-func newBody(data map[string]string) (body io.Reader) {
-	if data == nil {
-		return nil
+func newMultipartBody(a *Args) (body io.Reader, contentType string, err error) {
+	files := a.Files
+	file := files[0]
+	bodyBuffer := new(bytes.Buffer)
+	bodyWriter := multipart.NewWriter(bodyBuffer)
+	fileWriter, err := bodyWriter.CreateFormFile(file.FieldName, file.FileName)
+	if err != nil {
+		return nil, "", err
+	}
+	_, err = io.Copy(fileWriter, file.File)
+	if err != nil {
+		return nil, "", err
+	}
+	if a.Data != nil {
+		for k, v := range a.Data {
+			bodyWriter.WriteField(k, v)
+		}
+	}
+	contentType = bodyWriter.FormDataContentType()
+	body = bodyBuffer
+	defer bodyWriter.Close()
+	return
+}
+
+func newBody(a *Args) (body io.Reader, contentType string, err error) {
+	data := a.Data
+	files := a.Files
+	if data == nil && files == nil {
+		return nil, "", nil
+	}
+	if files != nil {
+		return newMultipartBody(a)
 	}
 
 	d := url.Values{}
 	for k, v := range data {
 		d.Set(k, v)
 	}
-	return strings.NewReader(d.Encode())
+	return strings.NewReader(d.Encode()), "", nil
 }
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
-	body := newBody(a.Data)
+	body, contentType, err := newBody(a)
 	u := newURL(url, a.Params)
 	req, err := http.NewRequest(method, u, body)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	applyHeaders(a, req)
+	applyHeaders(a, req, contentType)
 	applyCookies(a, req)
 
 	s, err := client.Do(req)

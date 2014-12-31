@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"net/http"
 
@@ -157,52 +159,70 @@ func cookies(a *request.Args) {
 	fmt.Println(a.Client.Jar.Cookies(url))
 }
 
+func file(a *request.Args) {
+	resp, _ := request.Post("http://httpbin.org/post", a)
+	defer resp.Body.Close()
+	fmt.Println(resp.Ok())
+	d, _ := resp.Json()
+	fmt.Println(d.Get("url"))
+	fmt.Println(d.Get("files"))
+}
+
+func files(a *request.Args) {
+	resp, _ := request.Post("http://httpbin.org/post", a)
+	defer resp.Body.Close()
+	fmt.Println(resp.Ok())
+	d, _ := resp.Json()
+	fmt.Println(d.Get("url"))
+	fmt.Println(d.Get("files"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
-	//
-	// fmt.Println("=====GET: ")
-	// get(a)
-	// fmt.Println("=====HEAD: ")
-	// head(a)
-	// fmt.Println("=====JSON: ")
-	// json(a)
-	// fmt.Println("=====GZIP: ")
-	// gzip(a)
-	//
-	// a.Data = map[string]string{
-	// 	"key": "value",
-	// 	"a":   "123",
-	// }
-	// fmt.Println("=====POST: ")
-	// post(a)
-	//
-	// fmt.Println("=====Custom Headers: ")
-	// customHeaders(a)
-	//
-	// a = request.NewArgs(c)
-	// a.Data = map[string]string{
-	// 	"key": "value",
-	// 	"a":   "123",
-	// }
-	// fmt.Println("=====PUT: ")
-	// put(a)
-	// fmt.Println("=====PATCH: ")
-	// patch(a)
-	// fmt.Println("=====DELTE: ")
-	// deleteF(a)
-	// fmt.Println("=====OPTIONS: ")
-	// options(a)
-	//
-	// a = request.NewArgs(c)
-	// a.Params = map[string]string{
-	// 	"a":   "abc",
-	// 	"key": "value",
-	// }
-	// fmt.Println("=====Params: ")
-	// get(a)
-	// getParams(a)
-	// post(a)
+
+	fmt.Println("=====GET: ")
+	get(a)
+	fmt.Println("=====HEAD: ")
+	head(a)
+	fmt.Println("=====JSON: ")
+	json(a)
+	fmt.Println("=====GZIP: ")
+	gzip(a)
+
+	a.Data = map[string]string{
+		"key": "value",
+		"a":   "123",
+	}
+	fmt.Println("=====POST: ")
+	post(a)
+
+	fmt.Println("=====Custom Headers: ")
+	customHeaders(a)
+
+	a = request.NewArgs(c)
+	a.Data = map[string]string{
+		"key": "value",
+		"a":   "123",
+	}
+	fmt.Println("=====PUT: ")
+	put(a)
+	fmt.Println("=====PATCH: ")
+	patch(a)
+	fmt.Println("=====DELTE: ")
+	deleteF(a)
+	fmt.Println("=====OPTIONS: ")
+	options(a)
+
+	a = request.NewArgs(c)
+	a.Params = map[string]string{
+		"a":   "abc",
+		"key": "value",
+	}
+	fmt.Println("=====Params: ")
+	get(a)
+	getParams(a)
+	post(a)
 
 	fmt.Println("=====Cookies: ")
 	a = request.NewArgs(c)
@@ -212,4 +232,21 @@ func main() {
 		"foo":  "bar",
 	}
 	cookies(a)
+
+	fmt.Println("=====File: ")
+	a = request.NewArgs(c)
+	b := &bytes.Buffer{}
+	w := bufio.NewWriter(b)
+	f := []byte{
+		'a',
+		'b',
+		'c',
+		'd',
+	}
+	_, _ = w.Write(f)
+	w.Flush()
+	a.Files = []request.FileField{
+		request.FileField{"a", "a.txt", b},
+	}
+	file(a)
 }

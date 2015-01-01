@@ -3,9 +3,9 @@ package request
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
@@ -45,7 +45,7 @@ func (resp *Response) Content() (b []byte, err error) {
 	case "gzip":
 		reader, err := gzip.NewReader(resp.Body)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		b, err = ioutil.ReadAll(reader)
 		defer reader.Close()
@@ -88,6 +88,7 @@ type Args struct {
 	Data    map[string]string
 	Params  map[string]string
 	Files   []FileField
+	Json    interface{}
 }
 
 var defaultHeaders = map[string]string{
@@ -96,7 +97,8 @@ var defaultHeaders = map[string]string{
 	"Accept":          "*/*",
 	"User-Agent":      "go-request/" + Version,
 }
-var defaultBodyType = "application/x-www-form-urlencoded"
+var defaultContentType = "application/x-www-form-urlencoded; charset=utf-8"
+var defaultJsonType = "application/json; charset=utf-8"
 
 func NewArgs(c *http.Client) *Args {
 	if c.Jar == nil {
@@ -114,6 +116,7 @@ func NewArgs(c *http.Client) *Args {
 		Data:    nil,
 		Params:  nil,
 		Files:   nil,
+		Json:    nil,
 	}
 }
 
@@ -135,7 +138,7 @@ func applyHeaders(a *Args, req *http.Request, contentType string) {
 		if contentType != "" {
 			req.Header.Set("Content-Type", contentType)
 		} else {
-			req.Header.Set("Content-Type", defaultBodyType)
+			req.Header.Set("Content-Type", defaultContentType)
 		}
 	}
 }
@@ -191,18 +194,26 @@ func newMultipartBody(a *Args) (body io.Reader, contentType string, err error) {
 	return
 }
 
+func newJsonBody(a *Args) (body io.Reader, contentType string, err error) {
+	b, err := json.Marshal(a.Json)
+	if err != nil {
+		return nil, "", err
+	}
+	return bytes.NewReader(b), defaultJsonType, err
+}
+
 func newBody(a *Args) (body io.Reader, contentType string, err error) {
-	data := a.Data
-	files := a.Files
-	if data == nil && files == nil {
+	if a.Data == nil && a.Files == nil && a.Json == nil {
 		return nil, "", nil
 	}
-	if files != nil {
+	if a.Files != nil {
 		return newMultipartBody(a)
+	} else if a.Json != nil {
+		return newJsonBody(a)
 	}
 
 	d := url.Values{}
-	for k, v := range data {
+	for k, v := range a.Data {
 		d.Set(k, v)
 	}
 	return strings.NewReader(d.Encode()), "", nil
@@ -214,8 +225,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	u := newURL(url, a.Params)
 	req, err := http.NewRequest(method, u, body)
 	if err != nil {
-		log.Fatal(err)
-		return
+		return nil, err
 	}
 	applyHeaders(a, req, contentType)
 	applyCookies(a, req)

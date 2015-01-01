@@ -179,6 +179,14 @@ func files(a *request.Args) {
 	fmt.Println(d.Get("files"))
 }
 
+func jsonPost(a *request.Args) {
+	resp, _ := request.Post("http://httpbin.org/post", a)
+	defer resp.Body.Close()
+	fmt.Println(resp.Ok())
+	d, _ := resp.Json()
+	fmt.Println(d.Get("json"))
+}
+
 func main() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
@@ -263,4 +271,30 @@ func main() {
 		request.FileField{"abc", "abc.txt", f2},
 	}
 	file(a)
+
+	fmt.Println("=====JSON POST: ")
+	type j struct {
+		A string            `json:"a"`
+		B map[string]string `json:"b"`
+		C []string          `json:"c"`
+		D []int             `json:"d"`
+		E int               `json:"e"`
+	}
+	a = request.NewArgs(c)
+	d := j{
+		A: "hello",
+		B: map[string]string{
+			"a": "A",
+			"b": "B",
+			"c": "C",
+		},
+		C: []string{"lala", "aaaa"},
+		D: []int{1, 2, 3},
+		E: 5,
+	}
+	fmt.Println(d)
+	a.Json = d
+	jsonPost(a)
+	a.Json = []int{1, 2, 3, 4}
+	jsonPost(a)
 }

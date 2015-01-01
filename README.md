@@ -43,8 +43,30 @@ resp, err := request.Get("http://httpbin.org/cookies", a)
 
 ```go
 a.Headers = map[string]string{
-  "Accept-Encoding": "gzip,deflate,sdch",
-  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+	"Accept-Encoding": "gzip,deflate,sdch",
+	"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 }
 resp, err := request.Get("http://httpbin.org/get", a)
+```
+
+**Files**:
+
+```go
+f, err := os.Open("test.txt")
+a.Files = []request.FileField{
+	request.FileField{"file", "test.txt", f},
+}
+resp, err := request.Post("http://httpbin.org/post", a)
+```
+
+**Json**:
+
+```go
+a.Json = map[string]string{
+	"a": "A",
+	"b": "B",
+}
+resp, err := request.Post("http://httpbin.org/post", a)
+a.Json = [1, 2, 3]
+resp, err = request.Post("http://httpbin.org/post", a)
 ```

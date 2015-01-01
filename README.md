@@ -67,6 +67,6 @@ a.Json = map[string]string{
 	"b": "B",
 }
 resp, err := request.Post("http://httpbin.org/post", a)
-a.Json = [1, 2, 3]
+a.Json = []int{1, 2, 3}
 resp, err = request.Post("http://httpbin.org/post", a)
 ```

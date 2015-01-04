@@ -5,6 +5,8 @@ go:
   - 1.4
   - tip
 
+sudo: false
+
 before_install:
   - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
   - go get github.com/axw/gocov/gocov

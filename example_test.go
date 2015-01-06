@@ -38,6 +38,24 @@ func ExampleGet_params() {
 	//http://httpbin.org/get?a=1&b=2
 }
 
+func ExampleGet_custom_headers() {
+	c := &http.Client{}
+	a := request.NewArgs(c)
+	a.Headers = map[string]string{
+		"X-Abc":      "abc",
+		"User-Agent": "go-request-test",
+	}
+	url := "http://httpbin.org/get"
+	resp, _ := request.Get(url, a)
+	d, _ := resp.Json()
+	defer resp.Body.Close()
+	fmt.Println(d.Get("headers").Get("User-Agent").MustString())
+	fmt.Println(d.Get("headers").Get("X-Abc").MustString())
+	// Output:
+	//go-request-test
+	//abc
+}
+
 func ExamplePost() {
 	c := &http.Client{}
 	a := request.NewArgs(c)

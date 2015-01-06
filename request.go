@@ -67,8 +67,11 @@ func (resp *Response) Text() (string, error) {
 	return s, err
 }
 
-func (resp *Response) Ok() bool {
+func (resp *Response) OK() bool {
 	return resp.StatusCode < 400
+}
+func (resp *Response) Ok() bool {
+	return resp.OK()
 }
 
 func (resp *Response) Reason() string {

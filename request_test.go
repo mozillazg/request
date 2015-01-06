@@ -18,9 +18,15 @@ func TestGet(t *testing.T) {
 	url := "http://httpbin.org/get"
 	resp, _ := Get(url, a)
 	d, _ := resp.Json()
+	t2, _ := resp.Text()
+	c2, _ := resp.Content()
 	defer resp.Body.Close()
 
+	assert.Equal(t, resp.Reason() != "", true)
 	assert.Equal(t, resp.Ok(), true)
+	assert.Equal(t, resp.OK(), true)
+	assert.Equal(t, t2 != "", true)
+	assert.Equal(t, c2 != nil, true)
 	assert.Equal(t, d.Get("url").MustString(), url)
 }
 

@@ -22,7 +22,7 @@ func ExampleGet() {
 	//http://httpbin.org/get
 }
 
-func ExampleGetparams() {
+func ExampleGet_params() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	a.Params = map[string]string{
@@ -34,10 +34,8 @@ func ExampleGetparams() {
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 	fmt.Println(d.Get("url").MustString())
-	fmt.Println(d.Get("args").MustMap())
 	// Output:
 	//http://httpbin.org/get?a=1&b=2
-	//map[a:1 b:2]
 }
 
 func ExamplePost() {
@@ -49,16 +47,10 @@ func ExamplePost() {
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := request.Post(url, a)
-	d, _ := resp.Json()
 	defer resp.Body.Close()
-	fmt.Println(resp.Ok())
-	fmt.Println(d.Get("form").MustMap())
-	// Output:
-	//true
-	//map[a:1 b:2]
 }
 
-func Examplecookies() {
+func Example_cookies() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	a.Cookies = map[string]string{
@@ -67,16 +59,10 @@ func Examplecookies() {
 	}
 	url := "http://httpbin.org/cookies"
 	resp, _ := request.Get(url, a)
-	d, _ := resp.Json()
 	defer resp.Body.Close()
-	fmt.Println(resp.Ok())
-	fmt.Println(d.Get("cookies").MustMap())
-	// Output:
-	//true
-	//map[name:value foo:bar]
 }
 
-func Examplefiles() {
+func Example_files() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	f, _ := os.Open("test.txt")

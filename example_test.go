@@ -50,7 +50,7 @@ func ExamplePost() {
 	defer resp.Body.Close()
 }
 
-func Example_cookies() {
+func ExampleGet_cookies() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	a.Cookies = map[string]string{
@@ -62,7 +62,7 @@ func Example_cookies() {
 	defer resp.Body.Close()
 }
 
-func Example_files() {
+func ExamplePost_files() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	f, _ := os.Open("test.txt")

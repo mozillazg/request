@@ -13,16 +13,13 @@ before_install:
   - go get github.com/mattn/goveralls
   - go get github.com/bitly/go-simplejson
   - go get golang.org/x/net/publicsuffix
+  - go get github.com/bmizerany/assert
 
 install:
   - go build
 
 script:
   - echo "test.txtabc" > test.txt
+  - echo "test.txtabc" > example/test.txt
   - go run example/base.go
-  # - $HOME/gopath/bin/goveralls -repotoken WAzmh3gmiQEUYEHM2wkwSH4oTrshvMmll
-
-notifications:
-  email:
-    on_success: change
-    on_failure: always
+  - $HOME/gopath/bin/goveralls -repotoken BB7TANeKBvI1vunBdOQSxseNkSQxDW2dz

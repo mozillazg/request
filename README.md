@@ -17,6 +17,7 @@ c := &http.Client{}
 a := request.NewArgs(c)
 resp, err := request.Get("http://httpbin.org/get", a)
 j, err := resp.Json()
+defer resp.Body.Close()  // Don't forget close the response body
 ```
 
 **POST**:

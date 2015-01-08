@@ -38,7 +38,7 @@ func ExampleGet_params() {
 	//http://httpbin.org/get?a=1&b=2
 }
 
-func ExampleGet_custom_headers() {
+func ExampleGet_customHeaders() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	a.Headers = map[string]string{

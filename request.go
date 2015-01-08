@@ -27,6 +27,7 @@ type Response struct {
 	content []byte
 }
 
+// Get Response Body as simplejson.Json
 func (resp *Response) Json() (*simplejson.Json, error) {
 	b, err := resp.Content()
 	if err != nil {
@@ -35,6 +36,7 @@ func (resp *Response) Json() (*simplejson.Json, error) {
 	return simplejson.NewJson(b)
 }
 
+// Get Response Body as []byte
 func (resp *Response) Content() (b []byte, err error) {
 	if resp.content != nil {
 		return resp.content, nil
@@ -61,19 +63,24 @@ func (resp *Response) Content() (b []byte, err error) {
 	return b, err
 }
 
+// Get Response Body as string
 func (resp *Response) Text() (string, error) {
 	b, err := resp.Content()
 	s := string(b)
 	return s, err
 }
 
+// Does Response StatusCode < 400?
 func (resp *Response) OK() bool {
 	return resp.StatusCode < 400
 }
+
+// Does Response StatusCode < 400 ?
 func (resp *Response) Ok() bool {
 	return resp.OK()
 }
 
+// Get Response Status
 func (resp *Response) Reason() string {
 	return resp.Status
 }

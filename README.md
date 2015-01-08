@@ -7,8 +7,29 @@ request
 Go HTTP Requests for Humans™. Inspired by [Python-Requests](https://github.com/kennethreitz/requests).
 
 
+Installation
+------------
+
+```
+go get -u github.com/mozillazg/request
+```
+
+
+Documentation
+--------------
+
+API documentation can be found here:
+https://godoc.org/github.com/mozillazg/request
+
+
 Usage
 -------
+
+```go
+import (
+	"github.com/mozillazg/request"
+)
+```
 
 **GET**:
 

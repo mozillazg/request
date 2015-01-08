@@ -20,6 +20,4 @@ install:
 
 script:
   - echo "test.txtabc" > test.txt
-  - echo "test.txtabc" > example/test.txt
-  - go run example/base.go
   - $HOME/gopath/bin/goveralls -repotoken BB7TANeKBvI1vunBdOQSxseNkSQxDW2dz

@@ -94,15 +94,21 @@ type FileField struct {
 	File      io.Reader
 }
 
+type BasicAuth struct {
+	Username string
+	Password string
+}
+
 type Args struct {
-	Client  *http.Client
-	Headers map[string]string
-	Cookies map[string]string
-	Data    map[string]string
-	Params  map[string]string
-	Files   []FileField
-	Json    interface{}
-	Proxy   string
+	Client    *http.Client
+	Headers   map[string]string
+	Cookies   map[string]string
+	Data      map[string]string
+	Params    map[string]string
+	Files     []FileField
+	Json      interface{}
+	Proxy     string
+	BasicAuth BasicAuth
 }
 
 var defaultHeaders = map[string]string{
@@ -124,25 +130,18 @@ func NewArgs(c *http.Client) *Args {
 	}
 
 	return &Args{
-		Client:  c,
-		Headers: defaultHeaders,
-		Cookies: nil,
-		Data:    nil,
-		Params:  nil,
-		Files:   nil,
-		Json:    nil,
-		Proxy:   "",
+		Client:    c,
+		Headers:   defaultHeaders,
+		Cookies:   nil,
+		Data:      nil,
+		Params:    nil,
+		Files:     nil,
+		Json:      nil,
+		Proxy:     "",
+		BasicAuth: BasicAuth{},
 	}
 }
 
-// Example:
-//	dialer, err := request.NewProxy("http://127.0.0.1:8080")
-//	// dialer, err := request.NewProxy("https://127.0.0.1:8080")
-//	// dialer, err := request.NewProxy("socks5://127.0.0.1:8080")
-//	if err == nil {
-//		tr := &http.Transport{Dial: dialer.Dial}
-//		c := &http.Client{Transport: tr}
-//	}
 func applyProxy(a *Args) (err error) {
 	if a.Proxy == "" {
 		return nil
@@ -287,6 +286,10 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	applyHeaders(a, req, contentType)
 	applyCookies(a, req)
 	applyProxy(a)
+
+	if a.BasicAuth.Username != "" {
+		req.SetBasicAuth(a.BasicAuth.Username, a.BasicAuth.Password)
+	}
 
 	s, err := client.Do(req)
 	resp = &Response{s, nil}

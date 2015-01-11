@@ -315,3 +315,20 @@ func TestProxy(t *testing.T) {
 	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
 	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
 }
+
+func TestBasicAuth(t *testing.T) {
+	c := &http.Client{}
+	a := NewArgs(c)
+	a.BasicAuth = BasicAuth{"user", "passwd"}
+	url := "http://httpbin.org/basic-auth/user/passwd"
+	resp, _ := Get(url, a)
+	assert.Equal(t, resp.OK(), true)
+
+	a.BasicAuth = BasicAuth{
+		Username: "user2",
+		Password: "passwd2",
+	}
+	url = "http://httpbin.org/basic-auth/user2/passwd2"
+	resp, _ = Get(url, a)
+	assert.Equal(t, resp.OK(), true)
+}

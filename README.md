@@ -98,6 +98,12 @@ resp, err = request.Post("http://httpbin.org/post", a)
 a.Proxy = "http://127.0.0.1:8080"
 // a.Proxy = "https://127.0.0.1:8080"
 // a.Proxy = "socks5://127.0.0.1:57341"
-resp, err := request.Post("http://httpbin.org/get", a)
+resp, err := request.Get("http://httpbin.org/get", a)
 ```
-or https://github.com/mozillazg/request/blob/master/\_example/proxy/
+or https://github.com/mozillazg/request/tree/develop/_example/proxy
+
+**HTTP Basic Authentication**:
+```go
+a.BasicAuth = request.BasicAuth{"user", "passwd"}
+resp, err := request.Get("http://httpbin.org/basic-auth/user/passwd", a)
+```

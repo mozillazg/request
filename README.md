@@ -92,3 +92,12 @@ resp, err := request.Post("http://httpbin.org/post", a)
 a.Json = []int{1, 2, 3}
 resp, err = request.Post("http://httpbin.org/post", a)
 ```
+
+**Proxy**:
+```go
+a.Proxy = "http://127.0.0.1:8080"
+// a.Proxy = "https://127.0.0.1:8080"
+// a.Proxy = "socks5://127.0.0.1:57341"
+resp, err := request.Post("http://httpbin.org/get", a)
+```
+or https://github.com/mozillazg/request/blob/master/\_example/proxy/

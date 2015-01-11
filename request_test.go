@@ -238,6 +238,7 @@ func TestPostFiles(t *testing.T) {
 	_, _ = w.Write(f)
 	w.Flush()
 	f2, _ := os.Open("test.txt")
+	defer f2.Close()
 	a.Data = map[string]string{
 		"key": "value",
 		"a":   "123",
@@ -278,4 +279,39 @@ func TestGzip(t *testing.T) {
 	assert.Equal(t, t2 != "", true)
 	assert.Equal(t, c2 != nil, true)
 	assert.Equal(t, d.Get("gzipped").MustBool(), true)
+}
+
+func currentIP(u string) (ip string) {
+	c := &http.Client{}
+	a := NewArgs(c)
+	a.Proxy = u
+	url := "http://httpbin.org/get"
+	resp, _ := Get(url, a)
+	d, _ := resp.Json()
+	defer resp.Body.Close()
+
+	return d.Get("origin").MustString()
+}
+func currentIPHTTPS(u string) (ip string) {
+	c := &http.Client{}
+	a := NewArgs(c)
+	a.Proxy = u
+	url := "https://httpbin.org/get"
+	resp, _ := Get(url, a)
+	d, _ := resp.Json()
+	defer resp.Body.Close()
+
+	return d.Get("origin").MustString()
+}
+
+func TestProxy(t *testing.T) {
+	ip := currentIP("")
+	httpProxyURL := os.Getenv("http_proxy_url")
+	httpsProxyURL := os.Getenv("https_proxy_url")
+	socks5ProxyURL := os.Getenv("socks5_proxy_url")
+
+	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
+	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
+	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
+	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
 }

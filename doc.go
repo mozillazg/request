@@ -53,4 +53,11 @@
 //	resp, err := request.Post("http://httpbin.org/post", a)
 //	a.Json = []int{1, 2, 3}
 //	resp, err = request.Post("http://httpbin.org/post", a)
+//
+// Proxy
+//
+//	a.Proxy = "http://127.0.0.1:8080"
+//	// a.Proxy = "https://127.0.0.1:8080"
+//	// a.Proxy = "socks5://127.0.0.1:57341"
+//	resp, err := request.Post("http://httpbin.org/get", a)
 package request

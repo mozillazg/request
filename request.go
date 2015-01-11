@@ -7,12 +7,15 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/bitly/go-simplejson"
+	"golang.org/x/net/proxy"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -99,6 +102,7 @@ type Args struct {
 	Params  map[string]string
 	Files   []FileField
 	Json    interface{}
+	Proxy   string
 }
 
 var defaultHeaders = map[string]string{
@@ -127,7 +131,49 @@ func NewArgs(c *http.Client) *Args {
 		Params:  nil,
 		Files:   nil,
 		Json:    nil,
+		Proxy:   "",
 	}
+}
+
+// Example:
+//	dialer, err := request.NewProxy("http://127.0.0.1:8080")
+//	// dialer, err := request.NewProxy("https://127.0.0.1:8080")
+//	// dialer, err := request.NewProxy("socks5://127.0.0.1:8080")
+//	if err == nil {
+//		tr := &http.Transport{Dial: dialer.Dial}
+//		c := &http.Client{Transport: tr}
+//	}
+func applyProxy(a *Args) (err error) {
+	if a.Proxy == "" {
+		return nil
+	}
+
+	u, err := url.Parse(a.Proxy)
+	if err != nil {
+		return err
+	}
+	switch u.Scheme {
+	case "http", "https":
+		a.Client.Transport = &http.Transport{
+			Proxy: http.ProxyURL(u),
+			Dial: (&net.Dialer{
+				Timeout: 30 * time.Second,
+				// KeepAlive: 30 * time.Second,
+			}).Dial,
+			// TLSHandshakeTimeout: 10 * time.Second,
+		}
+	case "socks5":
+		dialer, err := proxy.FromURL(u, proxy.Direct)
+		if err != nil {
+			return err
+		}
+		a.Client.Transport = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			Dial:  dialer.Dial,
+			// TLSHandshakeTimeout: 10 * time.Second,
+		}
+	}
+	return
 }
 
 func applyHeaders(a *Args, req *http.Request, contentType string) {
@@ -231,6 +277,7 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	client := a.Client
+
 	body, contentType, err := newBody(a)
 	u := newURL(url, a.Params)
 	req, err := http.NewRequest(method, u, body)
@@ -239,6 +286,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	}
 	applyHeaders(a, req, contentType)
 	applyCookies(a, req)
+	applyProxy(a)
 
 	s, err := client.Do(req)
 	resp = &Response{s, nil}

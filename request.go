@@ -296,36 +296,57 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	return
 }
 
+// Get issues a GET to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Get(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("GET", url, a)
 	return
 }
 
+// Head issues a HEAD to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Head(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("HEAD", url, a)
 	return
 }
 
+// Post issues a POST to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Post(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("POST", url, a)
 	return
 }
 
+// Put issues a PUT to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Put(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PUT", url, a)
 	return
 }
 
+// Patch issues a PATCH to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Patch(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PATCH", url, a)
 	return
 }
 
+// Delete issues a DELETE to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Delete(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("DELETE", url, a)
 	return
 }
 
+// Options issues a OPTIONS to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Options(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("OPTIONS", url, a)
 	return

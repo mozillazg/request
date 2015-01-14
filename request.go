@@ -99,6 +99,7 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	applyHeaders(a, req, contentType)
 	applyCookies(a, req)
 	applyProxy(a)
+	applyCheckRdirect(a)
 
 	if a.BasicAuth.Username != "" {
 		req.SetBasicAuth(a.BasicAuth.Username, a.BasicAuth.Password)

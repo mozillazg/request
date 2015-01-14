@@ -2,11 +2,12 @@ package request
 
 import "net/http"
 
+var defaultUserAgent = "go-request/" + Version
 var defaultHeaders = map[string]string{
 	"Connection":      "keep-alive",
 	"Accept-Encoding": "gzip, deflate",
 	"Accept":          "*/*",
-	"User-Agent":      "go-request/" + Version,
+	"User-Agent":      defaultUserAgent,
 }
 var defaultContentType = "application/x-www-form-urlencoded; charset=utf-8"
 var defaultJsonType = "application/json; charset=utf-8"

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 type FileField struct {
 	FieldName string

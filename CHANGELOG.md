@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 0.2.0 (2015-mm-dd)
+## 0.2.0 (2015-01-15)
 
 ### API Changes
 

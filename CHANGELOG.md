@@ -8,6 +8,7 @@
 * Add `Args.Proxy` for support HTTP/HTTPS/SOCKS5 proxy
 * Add `Args.BasicAuth` for Support HTTP Basic Authentication
 * Add `func (resp *Response) URL() (*url.URL, error)`
+* Add `var DefaultRedirectLimit = 10`
 
 ### Bugfixes
 

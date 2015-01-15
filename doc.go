@@ -2,7 +2,7 @@
 //
 // HTTP Request is so easy:
 //
-// GET Request
+// GET Request:
 //
 //
 // 	c := &http.Client{}
@@ -11,7 +11,7 @@
 // 	j, err := resp.Json()
 // 	defer resp.Body.Close()  // Don't forget close the response body
 //
-// POST Request
+// POST Request:
 //
 //	a.Data = map[string]string{
 //		"key": "value",
@@ -19,7 +19,7 @@
 //	}
 //	resp, err := request.Post("http://httpbin.org/post", a)
 //
-// Custom Cookies
+// Custom Cookies:
 //
 //	a.Cookies = map[string]string{
 //		"key": "value",
@@ -28,7 +28,7 @@
 //	resp, err := request.Get("http://httpbin.org/cookies", a)
 //
 //
-// Custom Headers
+// Custom Headers:
 //
 //	a.Headers = map[string]string{
 //		"Accept-Encoding": "gzip,deflate,sdch",
@@ -36,7 +36,7 @@
 //	}
 //	resp, err := request.Get("http://httpbin.org/get", a)
 //
-// Upload Files
+// Upload Files:
 //
 //	f, err := os.Open("test.txt")
 //	a.Files = []request.FileField{
@@ -44,7 +44,7 @@
 //	}
 //	resp, err := request.Post("http://httpbin.org/post", a)
 //
-// Json Body
+// Json Body:
 //
 //	a.Json = map[string]string{
 //		"a": "A",
@@ -53,4 +53,16 @@
 //	resp, err := request.Post("http://httpbin.org/post", a)
 //	a.Json = []int{1, 2, 3}
 //	resp, err = request.Post("http://httpbin.org/post", a)
+//
+// Proxy:
+//
+//	a.Proxy = "http://127.0.0.1:8080"
+//	// a.Proxy = "https://127.0.0.1:8080"
+//	// a.Proxy = "socks5://127.0.0.1:57341"
+//	resp, err := request.Get("http://httpbin.org/get", a)
+//
+// HTTP Basic Authentication:
+//
+//	a.BasicAuth = request.BasicAuth{"user", "passwd"}
+//	resp, err := request.Get("http://httpbin.org/basic-auth/user/passwd", a)
 package request

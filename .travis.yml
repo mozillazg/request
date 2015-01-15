@@ -13,6 +13,7 @@ before_install:
   - go get github.com/mattn/goveralls
   - go get github.com/bitly/go-simplejson
   - go get golang.org/x/net/publicsuffix
+  - go get golang.org/x/net/proxy
   - go get github.com/bmizerany/assert
 
 install:

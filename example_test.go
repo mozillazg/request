@@ -84,6 +84,7 @@ func ExamplePost_files() {
 	c := &http.Client{}
 	a := request.NewArgs(c)
 	f, _ := os.Open("test.txt")
+	defer f.Close()
 	a.Files = []request.FileField{
 		request.FileField{"abc", "abc.txt", f},
 	}

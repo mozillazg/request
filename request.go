@@ -1,89 +1,16 @@
 package request
 
 import (
-	"bytes"
-	"compress/gzip"
-	"encoding/json"
 	"io"
-	"io/ioutil"
-	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
 
-	"github.com/bitly/go-simplejson"
 	"golang.org/x/net/publicsuffix"
 )
 
-const Version = "0.1.0"
-
-// type Request struct {
-// 	*http.Request
-// }
-
-type Response struct {
-	*http.Response
-	content []byte
-}
-
-// Get Response Body as simplejson.Json
-func (resp *Response) Json() (*simplejson.Json, error) {
-	b, err := resp.Content()
-	if err != nil {
-		return nil, err
-	}
-	return simplejson.NewJson(b)
-}
-
-// Get Response Body as []byte
-func (resp *Response) Content() (b []byte, err error) {
-	if resp.content != nil {
-		return resp.content, nil
-	}
-
-	var reader io.ReadCloser
-	switch resp.Header.Get("Content-Encoding") {
-	case "gzip":
-		reader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		b, err = ioutil.ReadAll(reader)
-		defer reader.Close()
-	default:
-		reader = resp.Body
-		b, err = ioutil.ReadAll(reader)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-	resp.content = b
-	return b, err
-}
-
-// Get Response Body as string
-func (resp *Response) Text() (string, error) {
-	b, err := resp.Content()
-	s := string(b)
-	return s, err
-}
-
-// Does Response StatusCode < 400?
-func (resp *Response) OK() bool {
-	return resp.StatusCode < 400
-}
-
-// Does Response StatusCode < 400 ?
-func (resp *Response) Ok() bool {
-	return resp.OK()
-}
-
-// Get Response Status
-func (resp *Response) Reason() string {
-	return resp.Status
-}
+const Version = "0.2.0"
 
 type FileField struct {
 	FieldName string
@@ -91,24 +18,22 @@ type FileField struct {
 	File      io.Reader
 }
 
-type Args struct {
-	Client  *http.Client
-	Headers map[string]string
-	Cookies map[string]string
-	Data    map[string]string
-	Params  map[string]string
-	Files   []FileField
-	Json    interface{}
+type BasicAuth struct {
+	Username string
+	Password string
 }
 
-var defaultHeaders = map[string]string{
-	"Connection":      "keep-alive",
-	"Accept-Encoding": "gzip, deflate",
-	"Accept":          "*/*",
-	"User-Agent":      "go-request/" + Version,
+type Args struct {
+	Client    *http.Client
+	Headers   map[string]string
+	Cookies   map[string]string
+	Data      map[string]string
+	Params    map[string]string
+	Files     []FileField
+	Json      interface{}
+	Proxy     string
+	BasicAuth BasicAuth
 }
-var defaultContentType = "application/x-www-form-urlencoded; charset=utf-8"
-var defaultJsonType = "application/json; charset=utf-8"
 
 func NewArgs(c *http.Client) *Args {
 	if c.Jar == nil {
@@ -120,48 +45,16 @@ func NewArgs(c *http.Client) *Args {
 	}
 
 	return &Args{
-		Client:  c,
-		Headers: defaultHeaders,
-		Cookies: nil,
-		Data:    nil,
-		Params:  nil,
-		Files:   nil,
-		Json:    nil,
+		Client:    c,
+		Headers:   defaultHeaders,
+		Cookies:   nil,
+		Data:      nil,
+		Params:    nil,
+		Files:     nil,
+		Json:      nil,
+		Proxy:     "",
+		BasicAuth: BasicAuth{},
 	}
-}
-
-func applyHeaders(a *Args, req *http.Request, contentType string) {
-	// apply defaultHeaders
-	for k, v := range defaultHeaders {
-		_, ok := a.Headers[k]
-		if !ok {
-			req.Header.Set(k, v)
-		}
-	}
-	// apply custom Headers
-	for k, v := range a.Headers {
-		req.Header.Set(k, v)
-	}
-	// apply "Content-Type" Headers
-	_, ok := a.Headers["Content-Type"]
-	if !ok {
-		if contentType != "" {
-			req.Header.Set("Content-Type", contentType)
-		} else {
-			req.Header.Set("Content-Type", defaultContentType)
-		}
-	}
-}
-
-func applyCookies(a *Args, req *http.Request) {
-	if a.Cookies == nil {
-		return
-	}
-	cookies := a.Client.Jar.Cookies(req.URL)
-	for k, v := range a.Cookies {
-		cookies = append(cookies, &http.Cookie{Name: k, Value: v})
-	}
-	a.Client.Jar.SetCookies(req.URL, cookies)
 }
 
 func newURL(u string, params map[string]string) string {
@@ -177,39 +70,6 @@ func newURL(u string, params map[string]string) string {
 		return u + "&" + p.Encode()
 	}
 	return u + "?" + p.Encode()
-}
-
-func newMultipartBody(a *Args) (body io.Reader, contentType string, err error) {
-	files := a.Files
-	bodyBuffer := new(bytes.Buffer)
-	bodyWriter := multipart.NewWriter(bodyBuffer)
-	for _, file := range files {
-		fileWriter, err := bodyWriter.CreateFormFile(file.FieldName, file.FileName)
-		if err != nil {
-			return nil, "", err
-		}
-		_, err = io.Copy(fileWriter, file.File)
-		if err != nil {
-			return nil, "", err
-		}
-	}
-	if a.Data != nil {
-		for k, v := range a.Data {
-			bodyWriter.WriteField(k, v)
-		}
-	}
-	contentType = bodyWriter.FormDataContentType()
-	defer bodyWriter.Close()
-	body = bodyBuffer
-	return
-}
-
-func newJsonBody(a *Args) (body io.Reader, contentType string, err error) {
-	b, err := json.Marshal(a.Json)
-	if err != nil {
-		return nil, "", err
-	}
-	return bytes.NewReader(b), defaultJsonType, err
 }
 
 func newBody(a *Args) (body io.Reader, contentType string, err error) {
@@ -230,7 +90,6 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 }
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
-	client := a.Client
 	body, contentType, err := newBody(a)
 	u := newURL(url, a.Params)
 	req, err := http.NewRequest(method, u, body)
@@ -239,42 +98,69 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	}
 	applyHeaders(a, req, contentType)
 	applyCookies(a, req)
+	applyProxy(a)
+	applyCheckRdirect(a)
 
-	s, err := client.Do(req)
+	if a.BasicAuth.Username != "" {
+		req.SetBasicAuth(a.BasicAuth.Username, a.BasicAuth.Password)
+	}
+
+	s, err := a.Client.Do(req)
 	resp = &Response{s, nil}
 	return
 }
 
+// Get issues a GET to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Get(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("GET", url, a)
 	return
 }
 
+// Head issues a HEAD to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Head(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("HEAD", url, a)
 	return
 }
 
+// Post issues a POST to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Post(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("POST", url, a)
 	return
 }
 
+// Put issues a PUT to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Put(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PUT", url, a)
 	return
 }
 
+// Patch issues a PATCH to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Patch(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PATCH", url, a)
 	return
 }
 
+// Delete issues a DELETE to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Delete(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("DELETE", url, a)
 	return
 }
 
+// Options issues a OPTIONS to the specified URL.
+//
+// Caller should close resp.Body when done reading from it.
 func Options(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("OPTIONS", url, a)
 	return

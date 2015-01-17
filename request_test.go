@@ -305,17 +305,17 @@ func currentIPHTTPS(u string) (ip string) {
 	return d.Get("origin").MustString()
 }
 
-// func TestProxy(t *testing.T) {
-// 	ip := currentIP("")
-// 	httpProxyURL := os.Getenv("http_proxy_url")
-// 	httpsProxyURL := os.Getenv("https_proxy_url")
-// 	socks5ProxyURL := os.Getenv("socks5_proxy_url")
-//
-// 	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
-// 	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
-// 	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
-// 	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
-// }
+func TestProxy(t *testing.T) {
+	ip := currentIP("")
+	httpProxyURL := os.Getenv("http_proxy_url")
+	httpsProxyURL := os.Getenv("https_proxy_url")
+	socks5ProxyURL := os.Getenv("socks5_proxy_url")
+
+	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
+	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
+	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
+	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
+}
 
 func TestBasicAuth(t *testing.T) {
 	c := &http.Client{}

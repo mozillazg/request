@@ -8,8 +8,13 @@ import (
 	"github.com/mozillazg/request"
 )
 
+const (
+	loginRequiredPageURL = "http://login-test.3sd.me:10081/"
+	loginPageURL         = "http://login-test.3sd.me:10081/login/"
+)
+
 func home(a *request.Args) (statusCode int) {
-	resp, err := request.Get("http://login-test.3sd.me:10081/", a)
+	resp, err := request.Get(loginRequiredPageURL, a)
 	if err != nil {
 		return 500
 	}
@@ -17,8 +22,7 @@ func home(a *request.Args) (statusCode int) {
 }
 
 func getCSRFToken(a *request.Args) (string, error) {
-	url := "http://login-test.3sd.me:10081/login/"
-	resp, err := request.Get(url, a)
+	resp, err := request.Get(loginPageURL, a)
 	if err != nil {
 		return "", err
 	}
@@ -40,8 +44,7 @@ func getCSRFToken(a *request.Args) (string, error) {
 }
 
 func login(a *request.Args) error {
-	url := "http://login-test.3sd.me:10081/login/"
-	_, err := request.Post(url, a)
+	_, err := request.Post(loginPageURL, a)
 	return err
 }
 

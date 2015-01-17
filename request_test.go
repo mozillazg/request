@@ -305,17 +305,17 @@ func currentIPHTTPS(u string) (ip string) {
 	return d.Get("origin").MustString()
 }
 
-func TestProxy(t *testing.T) {
-	ip := currentIP("")
-	httpProxyURL := os.Getenv("http_proxy_url")
-	httpsProxyURL := os.Getenv("https_proxy_url")
-	socks5ProxyURL := os.Getenv("socks5_proxy_url")
-
-	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
-	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
-	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
-	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
-}
+// func TestProxy(t *testing.T) {
+// 	ip := currentIP("")
+// 	httpProxyURL := os.Getenv("http_proxy_url")
+// 	httpsProxyURL := os.Getenv("https_proxy_url")
+// 	socks5ProxyURL := os.Getenv("socks5_proxy_url")
+//
+// 	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
+// 	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
+// 	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
+// 	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
+// }
 
 func TestBasicAuth(t *testing.T) {
 	c := &http.Client{}
@@ -353,7 +353,7 @@ func TestResponseURL(t *testing.T) {
 	}
 	resp, _ = Get(url, a)
 	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/redirect/2")
+	assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/2")
 
 }
 
@@ -373,7 +373,7 @@ func TestCheckRedirect(t *testing.T) {
 	url = "http://httpbin.org/redirect/15"
 	resp, _ = Get(url, a)
 	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/redirect/4")
+	assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/4")
 
 	url = "http://httpbin.org/redirect/2"
 	a.Headers = map[string]string{
@@ -383,7 +383,7 @@ func TestCheckRedirect(t *testing.T) {
 	u, _ = resp.URL()
 	referer := resp.Request.Header.Get("Referer")
 	assert.Equal(t, u.String(), "http://httpbin.org/get")
-	assert.Equal(t, referer, "http://httpbin.org/redirect/1")
+	assert.Equal(t, referer, "http://httpbin.org/relative-redirect/1")
 	assert.Equal(t, resp.Request.Header.Get("User-Agent"), defaultUserAgent)
 
 	url = "http://httpbin.org/redirect/12"

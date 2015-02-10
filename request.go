@@ -126,6 +126,7 @@ func Get(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// url can be string or *url.URL
 func (req *Request) Get(url interface{}) (resp *Response, err error) {
 	resp, err = Get(url2string(url), req2arg(req))
 	return

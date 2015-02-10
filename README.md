@@ -34,9 +34,9 @@ import (
 **GET**:
 
 ```go
-c := &http.Client{}
-a := request.NewArgs(c)
-resp, err := request.Get("http://httpbin.org/get", a)
+c := new(http.Client)
+req := request.NewRequest(c)
+resp, err := request.Get("http://httpbin.org/get")
 j, err := resp.Json()
 defer resp.Body.Close()  // Don't forget close the response body
 ```
@@ -44,66 +44,66 @@ defer resp.Body.Close()  // Don't forget close the response body
 **POST**:
 
 ```go
-a.Data = map[string]string{
+req.Data = map[string]string{
 	"key": "value",
 	"a":   "123",
 }
-resp, err := request.Post("http://httpbin.org/post", a)
+resp, err := request.Post("http://httpbin.org/post")
 ```
 
 **Cookies**:
 
 ```go
-a.Cookies = map[string]string{
+req.Cookies = map[string]string{
 	"key": "value",
 	"a":   "123",
 }
-resp, err := request.Get("http://httpbin.org/cookies", a)
+resp, err := request.Get("http://httpbin.org/cookies")
 ```
 
 **Headers**:
 
 ```go
-a.Headers = map[string]string{
+req.Headers = map[string]string{
 	"Accept-Encoding": "gzip,deflate,sdch",
 	"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 }
-resp, err := request.Get("http://httpbin.org/get", a)
+resp, err := request.Get("http://httpbin.org/get")
 ```
 
 **Files**:
 
 ```go
 f, err := os.Open("test.txt")
-a.Files = []request.FileField{
+req.Files = []request.FileField{
 	request.FileField{"file", "test.txt", f},
 }
-resp, err := request.Post("http://httpbin.org/post", a)
+resp, err := request.Post("http://httpbin.org/post")
 ```
 
 **Json**:
 
 ```go
-a.Json = map[string]string{
+req.Json = map[string]string{
 	"a": "A",
 	"b": "B",
 }
-resp, err := request.Post("http://httpbin.org/post", a)
-a.Json = []int{1, 2, 3}
-resp, err = request.Post("http://httpbin.org/post", a)
+resp, err := request.Post("http://httpbin.org/post")
+req.Json = []int{1, 2, 3}
+resp, err = request.Post("http://httpbin.org/post")
 ```
 
 **Proxy**:
 ```go
-a.Proxy = "http://127.0.0.1:8080"
-// a.Proxy = "https://127.0.0.1:8080"
-// a.Proxy = "socks5://127.0.0.1:57341"
-resp, err := request.Get("http://httpbin.org/get", a)
+req.Proxy = "http://127.0.0.1:8080"
+// req.Proxy = "https://127.0.0.1:8080"
+// req.Proxy = "socks5://127.0.0.1:57341"
+resp, err := request.Get("http://httpbin.org/get")
 ```
 or https://github.com/mozillazg/request/tree/develop/_example/proxy
 
 **HTTP Basic Authentication**:
 ```go
-a.BasicAuth = request.BasicAuth{"user", "passwd"}
-resp, err := request.Get("http://httpbin.org/basic-auth/user/passwd", a)
+req.BasicAuth = request.BasicAuth{"user", "passwd"}
+resp, err := request.Get("http://httpbin.org/basic-auth/user/passwd")
 ```

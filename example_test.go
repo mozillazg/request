@@ -3,16 +3,20 @@ package request_test
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/mozillazg/request"
 )
 
 func ExampleGet() {
-	c := &http.Client{}
-	a := request.NewArgs(c)
+	c := new(http.Client)
+	req := request.NewRequest(c)
+	u2, _ := url.Parse("http://httpbin.org/get")
+	resp, _ := req.Get(u2)
+
 	url := "http://httpbin.org/get"
-	resp, _ := request.Get(url, a)
+	resp, _ = req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 	fmt.Println(resp.Ok())
@@ -23,14 +27,14 @@ func ExampleGet() {
 }
 
 func ExampleGet_params() {
-	c := &http.Client{}
-	a := request.NewArgs(c)
-	a.Params = map[string]string{
+	c := new(http.Client)
+	req := request.NewRequest(c)
+	req.Params = map[string]string{
 		"a": "1",
 		"b": "2",
 	}
 	url := "http://httpbin.org/get"
-	resp, _ := request.Get(url, a)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 	fmt.Println(d.Get("url").MustString())
@@ -39,14 +43,14 @@ func ExampleGet_params() {
 }
 
 func ExampleGet_customHeaders() {
-	c := &http.Client{}
-	a := request.NewArgs(c)
-	a.Headers = map[string]string{
+	c := new(http.Client)
+	req := request.NewRequest(c)
+	req.Headers = map[string]string{
 		"X-Abc":      "abc",
 		"User-Agent": "go-request-test",
 	}
 	url := "http://httpbin.org/get"
-	resp, _ := request.Get(url, a)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 	fmt.Println(d.Get("headers").Get("User-Agent").MustString())
@@ -57,38 +61,38 @@ func ExampleGet_customHeaders() {
 }
 
 func ExamplePost() {
-	c := &http.Client{}
-	a := request.NewArgs(c)
-	a.Data = map[string]string{
+	c := new(http.Client)
+	req := request.NewRequest(c)
+	req.Data = map[string]string{
 		"a": "1",
 		"b": "2",
 	}
 	url := "http://httpbin.org/post"
-	resp, _ := request.Post(url, a)
+	resp, _ := req.Post(url)
 	defer resp.Body.Close()
 }
 
 func ExampleGet_cookies() {
-	c := &http.Client{}
-	a := request.NewArgs(c)
-	a.Cookies = map[string]string{
+	c := new(http.Client)
+	req := request.NewRequest(c)
+	req.Cookies = map[string]string{
 		"name": "value",
 		"foo":  "bar",
 	}
 	url := "http://httpbin.org/cookies"
-	resp, _ := request.Get(url, a)
+	resp, _ := req.Get(url)
 	defer resp.Body.Close()
 }
 
 func ExamplePost_files() {
-	c := &http.Client{}
-	a := request.NewArgs(c)
+	c := new(http.Client)
+	req := request.NewRequest(c)
 	f, _ := os.Open("test.txt")
 	defer f.Close()
-	a.Files = []request.FileField{
+	req.Files = []request.FileField{
 		request.FileField{"abc", "abc.txt", f},
 	}
 	url := "http://httpbin.org/post"
-	resp, _ := request.Post(url, a)
+	resp, _ := req.Post(url)
 	defer resp.Body.Close()
 }

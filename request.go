@@ -211,6 +211,9 @@ func url2string(u interface{}) string {
 	case url.URL:
 		s := u.(url.URL)
 		return s.String()
+	case *url.URL:
+		s := u.(*url.URL)
+		return s.String()
 	}
 	return ""
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
 
@@ -16,8 +17,20 @@ import (
 func TestGet(t *testing.T) {
 	c := &http.Client{}
 	req := NewRequest(c)
+	u2, _ := url.Parse("http://httpbin.org/get")
+	resp, _ := req.Get(u2)
+	assert.Equal(t, resp.Ok(), true)
+
+	u3 := url.URL{
+		Scheme: "http",
+		Host:   "httpbin.org",
+		Path:   "get",
+	}
+	resp, _ = req.Get(u3)
+	assert.Equal(t, resp.Ok(), true)
+
 	url := "http://httpbin.org/get"
-	resp, _ := req.Get(url)
+	resp, _ = req.Get(url)
 	d, _ := resp.Json()
 	t2, _ := resp.Text()
 	c2, _ := resp.Content()
@@ -29,6 +42,7 @@ func TestGet(t *testing.T) {
 	assert.Equal(t, t2 != "", true)
 	assert.Equal(t, c2 != nil, true)
 	assert.Equal(t, d.Get("url").MustString(), url)
+
 }
 
 func TestGetParmas(t *testing.T) {

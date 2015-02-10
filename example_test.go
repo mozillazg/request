@@ -3,7 +3,6 @@ package request_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 
 	"github.com/mozillazg/request"
@@ -12,11 +11,8 @@ import (
 func ExampleGet() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
-	u2, _ := url.Parse("http://httpbin.org/get")
-	resp, _ := req.Get(u2)
-
 	url := "http://httpbin.org/get"
-	resp, _ = req.Get(url)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 	fmt.Println(resp.Ok())

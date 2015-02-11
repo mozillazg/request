@@ -13,16 +13,16 @@ const (
 	loginPageURL         = "http://login-test.3sd.me:10081/login/"
 )
 
-func home(a *request.Args) (statusCode int) {
-	resp, err := request.Get(loginRequiredPageURL, a)
+func home(req *request.Request) (statusCode int) {
+	resp, err := req.Get(loginRequiredPageURL)
 	if err != nil {
 		return 500
 	}
 	return resp.StatusCode
 }
 
-func getCSRFToken(a *request.Args) (string, error) {
-	resp, err := request.Get(loginPageURL, a)
+func getCSRFToken(req *request.Request) (string, error) {
+	resp, err := req.Get(loginPageURL)
 	if err != nil {
 		return "", err
 	}
@@ -43,31 +43,31 @@ func getCSRFToken(a *request.Args) (string, error) {
 	return csrfToken[1], err
 }
 
-func login(a *request.Args) error {
-	_, err := request.Post(loginPageURL, a)
+func login(req *request.Request) error {
+	_, err := req.Post(loginPageURL)
 	return err
 }
 
 func main() {
 	c := new(http.Client)
-	a := request.NewArgs(c)
-	log.Println(home(a)) // 403
+	req := request.NewRequest(c)
+	log.Println(home(req)) // 403
 
 	// login
-	csrfToken, err := getCSRFToken(a)
+	csrfToken, err := getCSRFToken(req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	a.Data = map[string]string{
+	req.Data = map[string]string{
 		"csrfmiddlewaretoken": csrfToken,
 		"name":                "go-request",
 		"password":            "go-request-passwd",
 	}
 	log.Println(csrfToken)
-	err = login(a)
+	err = login(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(home(a)) // 200
+	log.Println(home(req)) // 200
 }

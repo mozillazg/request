@@ -14,25 +14,25 @@ func httpProxy(URL string) {
 		Proxy: http.ProxyURL(proxyURL),
 	}
 	c := &http.Client{Transport: tr}
-	a := request.NewArgs(c)
-	resp, err := request.Get("http://httpbin.org/get", a)
+	req := request.NewRequest(c)
+	resp, err := req.Get("http://httpbin.org/get")
 	fmt.Println(err)
 	fmt.Println(resp.Text())
 }
 
 func httpProxy2(URL string) {
 	c := &http.Client{}
-	a := request.NewArgs(c)
-	a.Proxy = URL
-	resp, err := request.Get("http://httpbin.org/get", a)
+	req := request.NewRequest(c)
+	req.Proxy = URL
+	resp, err := req.Get("http://httpbin.org/get")
 	fmt.Println(err)
 	fmt.Println(resp.Text())
 }
 
 func main() {
 	// c := new(http.Client)
-	// a := request.NewArgs(c)
-	// request.Get("http://httpbin.org/get", a)
+	// req := request.NewRequest(c)
+	// req.Get("http://httpbin.org/get")
 	// httpProxy("http://64.31.22.131:8089")
 	// httpProxy("https://64.31.22.131:8089")
 	// httpProxy2("http://64.31.22.131:8089")

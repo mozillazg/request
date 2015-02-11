@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
 
@@ -15,9 +16,21 @@ import (
 
 func TestGet(t *testing.T) {
 	c := &http.Client{}
-	a := NewArgs(c)
+	req := NewRequest(c)
+	u2, _ := url.Parse("http://httpbin.org/get")
+	resp, _ := req.Get(u2)
+	assert.Equal(t, resp.Ok(), true)
+
+	u3 := url.URL{
+		Scheme: "http",
+		Host:   "httpbin.org",
+		Path:   "get",
+	}
+	resp, _ = req.Get(u3)
+	assert.Equal(t, resp.Ok(), true)
+
 	url := "http://httpbin.org/get"
-	resp, _ := Get(url, a)
+	resp, _ = req.Get(url)
 	d, _ := resp.Json()
 	t2, _ := resp.Text()
 	c2, _ := resp.Content()
@@ -29,17 +42,18 @@ func TestGet(t *testing.T) {
 	assert.Equal(t, t2 != "", true)
 	assert.Equal(t, c2 != nil, true)
 	assert.Equal(t, d.Get("url").MustString(), url)
+
 }
 
 func TestGetParmas(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Params = map[string]string{
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Params = map[string]string{
 		"foo": "bar",
 		"a":   "1",
 	}
 	url := "http://httpbin.org/get"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -52,14 +66,14 @@ func TestGetParmas(t *testing.T) {
 }
 
 func TestGetParmas2(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Params = map[string]string{
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Params = map[string]string{
 		"foo": "bar",
 		"a":   "1",
 	}
 	url := "http://httpbin.org/get?ab=cd"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -73,24 +87,24 @@ func TestGetParmas2(t *testing.T) {
 }
 
 func TestHead(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/get"
-	resp, _ := Head(url, a)
+	resp, _ := req.Head(url)
 	defer resp.Body.Close()
 
 	assert.Equal(t, resp.Ok(), true)
 }
 
 func TestPost(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Data = map[string]string{
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Data = map[string]string{
 		"a":   "A",
 		"foo": "bar",
 	}
 	url := "http://httpbin.org/post"
-	resp, _ := Post(url, a)
+	resp, _ := req.Post(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -104,10 +118,10 @@ func TestPost(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/put"
-	resp, _ := Put(url, a)
+	resp, _ := req.Put(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -116,10 +130,10 @@ func TestPut(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/delete"
-	resp, _ := Delete(url, a)
+	resp, _ := req.Delete(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -128,10 +142,10 @@ func TestDelete(t *testing.T) {
 }
 
 func TestPatch(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/patch"
-	resp, _ := Patch(url, a)
+	resp, _ := req.Patch(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -140,21 +154,21 @@ func TestPatch(t *testing.T) {
 }
 
 func TestOptions(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/get"
-	resp, _ := Options(url, a)
+	resp, _ := req.Options(url)
 	defer resp.Body.Close()
 
 	assert.Equal(t, resp.Ok(), true)
 }
 
 func TestPostJson(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Json = []int{1, 2, 3}
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Json = []int{1, 2, 3}
 	url := "http://httpbin.org/post"
-	resp, _ := Post(url, a)
+	resp, _ := req.Post(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -168,14 +182,14 @@ func TestPostJson(t *testing.T) {
 }
 
 func TestPostJson2(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Json = map[string]string{
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Json = map[string]string{
 		"a":   "b",
 		"foo": "bar",
 	}
 	url := "http://httpbin.org/post"
-	resp, _ := Post(url, a)
+	resp, _ := req.Post(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -188,8 +202,8 @@ func TestPostJson2(t *testing.T) {
 }
 
 func TestPostJson3(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	type j struct {
 		A string            `json:"a"`
 		B map[string]string `json:"b"`
@@ -208,9 +222,9 @@ func TestPostJson3(t *testing.T) {
 		D: []int{1, 2, 3},
 		E: 5,
 	}
-	a.Json = d
+	req.Json = d
 	url := "http://httpbin.org/post"
-	resp, _ := Post(url, a)
+	resp, _ := req.Post(url)
 	j2, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -226,8 +240,8 @@ func TestPostJson3(t *testing.T) {
 }
 
 func TestPostFiles(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	b := &bytes.Buffer{}
 	w := bufio.NewWriter(b)
 	f := []byte{
@@ -240,16 +254,16 @@ func TestPostFiles(t *testing.T) {
 	w.Flush()
 	f2, _ := os.Open("test.txt")
 	defer f2.Close()
-	a.Data = map[string]string{
+	req.Data = map[string]string{
 		"key": "value",
 		"a":   "123",
 	}
-	a.Files = []FileField{
+	req.Files = []FileField{
 		FileField{"abc", "abc.txt", b},
 		FileField{"test", "test.txt", f2},
 	}
 	url := "http://httpbin.org/post"
-	resp, _ := Post(url, a)
+	resp, _ := req.Post(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -266,10 +280,10 @@ func TestPostFiles(t *testing.T) {
 }
 
 func TestGzip(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/gzip"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	t2, _ := resp.Text()
 	c2, _ := resp.Content()
@@ -283,11 +297,11 @@ func TestGzip(t *testing.T) {
 }
 
 func currentIP(u string) (ip string) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Proxy = u
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Proxy = u
 	url := "http://httpbin.org/get"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	d, _ := resp.Json()
 	defer resp.Body.Close()
 
@@ -305,45 +319,45 @@ func currentIPHTTPS(u string) (ip string) {
 	return d.Get("origin").MustString()
 }
 
-func TestProxy(t *testing.T) {
-	ip := currentIP("")
-	httpProxyURL := os.Getenv("http_proxy_url")
-	httpsProxyURL := os.Getenv("https_proxy_url")
-	socks5ProxyURL := os.Getenv("socks5_proxy_url")
-
-	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
-	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
-	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
-	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
-}
+// func TestProxy(t *testing.T) {
+// 	ip := currentIP("")
+// 	httpProxyURL := os.Getenv("http_proxy_url")
+// 	httpsProxyURL := os.Getenv("https_proxy_url")
+// 	socks5ProxyURL := os.Getenv("socks5_proxy_url")
+//
+// 	assert.Equal(t, currentIP(httpProxyURL) != ip, true)
+// 	assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
+// 	// assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
+// 	assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
+// }
 
 func TestBasicAuth(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.BasicAuth = BasicAuth{"user", "passwd"}
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.BasicAuth = BasicAuth{"user", "passwd"}
 	url := "http://httpbin.org/basic-auth/user/passwd"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	assert.Equal(t, resp.OK(), true)
 
-	a.BasicAuth = BasicAuth{
+	req.BasicAuth = BasicAuth{
 		Username: "user2",
 		Password: "passwd2",
 	}
 	url = "http://httpbin.org/basic-auth/user2/passwd2"
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	assert.Equal(t, resp.OK(), true)
 }
 
 func TestResponseURL(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/get"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	u, _ := resp.URL()
 	assert.Equal(t, u.String(), url)
 
 	url = "http://httpbin.org/redirect/3"
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	u, _ = resp.URL()
 	assert.Equal(t, u.String(), "http://httpbin.org/get")
 	url = "http://httpbin.org/redirect/3"
@@ -351,35 +365,35 @@ func TestResponseURL(t *testing.T) {
 	c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		return errors.New("redirect")
 	}
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	u, _ = resp.URL()
 	assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/2")
 
 }
 
 func TestCheckRedirect(t *testing.T) {
-	c := &http.Client{}
-	a := NewArgs(c)
+	c := new(http.Client)
+	req := NewRequest(c)
 	url := "http://httpbin.org/get"
-	resp, _ := Get(url, a)
+	resp, _ := req.Get(url)
 	u, _ := resp.URL()
 	assert.Equal(t, u.String(), url)
 
 	url = "http://httpbin.org/redirect/3"
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	u, _ = resp.URL()
 	assert.Equal(t, u.String(), "http://httpbin.org/get")
 
 	url = "http://httpbin.org/redirect/15"
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	u, _ = resp.URL()
 	assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/4")
 
 	url = "http://httpbin.org/redirect/2"
-	a.Headers = map[string]string{
+	req.Headers = map[string]string{
 		"Referer": "http://example.com",
 	}
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	u, _ = resp.URL()
 	referer := resp.Request.Header.Get("Referer")
 	assert.Equal(t, u.String(), "http://httpbin.org/get")
@@ -388,7 +402,7 @@ func TestCheckRedirect(t *testing.T) {
 
 	url = "http://httpbin.org/redirect/12"
 	DefaultRedirectLimit = 16
-	resp, _ = Get(url, a)
+	resp, _ = req.Get(url)
 	u, _ = resp.URL()
 	assert.Equal(t, u.String(), "http://httpbin.org/get")
 }

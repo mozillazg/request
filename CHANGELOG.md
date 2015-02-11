@@ -1,6 +1,21 @@
 # Changelog
 
 
+## 0.3.0 (2015-02-11)
+
+### API Changes
+
+* Add `type Request struct`, recommend use it instead of `Args`
+* Add `func NewRequest(c *http.Client) *Request`
+* Add `func (req *Request) Get(url interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Head(url interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Post(url interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Put(url interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Patch(url interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Delete(url interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Options(url interface{}) (resp *Response, err error)`
+
+
 ## 0.2.0 (2015-01-15)
 
 ### API Changes

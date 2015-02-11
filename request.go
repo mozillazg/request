@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-const Version = "0.2.0"
+const Version = "0.3.0"
 
 type FileField struct {
 	FieldName string
@@ -126,7 +126,7 @@ func Get(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
-// url can be string or *url.URL
+// url can be string or *url.URL or ur.URL
 func (req *Request) Get(url interface{}) (resp *Response, err error) {
 	resp, err = Get(url2string(url), req2arg(req))
 	return
@@ -140,6 +140,7 @@ func Head(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// url can be string or *url.URL or ur.URL
 func (req *Request) Head(url interface{}) (resp *Response, err error) {
 	resp, err = Head(url2string(url), req2arg(req))
 	return
@@ -152,6 +153,8 @@ func Post(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("POST", url, a)
 	return
 }
+
+// url can be string or *url.URL or ur.URL
 func (req *Request) Post(url interface{}) (resp *Response, err error) {
 	resp, err = Post(url2string(url), req2arg(req))
 	return
@@ -164,6 +167,8 @@ func Put(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PUT", url, a)
 	return
 }
+
+// url can be string or *url.URL or ur.URL
 func (req *Request) Put(url interface{}) (resp *Response, err error) {
 	resp, err = Put(url2string(url), req2arg(req))
 	return
@@ -176,6 +181,8 @@ func Patch(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("PATCH", url, a)
 	return
 }
+
+// url can be string or *url.URL or ur.URL
 func (req *Request) Patch(url interface{}) (resp *Response, err error) {
 	resp, err = Patch(url2string(url), req2arg(req))
 	return
@@ -188,6 +195,8 @@ func Delete(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("DELETE", url, a)
 	return
 }
+
+// url can be string or *url.URL or ur.URL
 func (req *Request) Delete(url interface{}) (resp *Response, err error) {
 	resp, err = Delete(url2string(url), req2arg(req))
 	return
@@ -200,6 +209,8 @@ func Options(url string, a *Args) (resp *Response, err error) {
 	resp, err = newRequest("OPTIONS", url, a)
 	return
 }
+
+// url can be string or *url.URL or ur.URL
 func (req *Request) Options(url interface{}) (resp *Response, err error) {
 	resp, err = Options(url2string(url), req2arg(req))
 	return

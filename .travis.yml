@@ -23,4 +23,9 @@ install:
 
 script:
   - echo "test.txtabc" > test.txt
+  - go test -v
   - $HOME/gopath/bin/goveralls -repotoken BB7TANeKBvI1vunBdOQSxseNkSQxDW2dz
+
+matrix:
+  allow_failures:
+    - go: 1.1

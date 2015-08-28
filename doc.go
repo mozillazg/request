@@ -65,4 +65,12 @@
 //
 //	req.BasicAuth = request.BasicAuth{"user", "passwd"}
 //	resp, err := req.Get("http://httpbin.org/basic-auth/user/passwd")
+//
+// Need more control?
+//
+// You can change req.Client like http.Client, for example: set timeout
+//
+// timeout := time.Duration(1 * time.Second)
+// req.Client.Timeout = timeout
+// req.Get("http://httpbin.org/get")
 package request

@@ -29,4 +29,11 @@ func main() {
 	c.Timeout = timeout
 	fmt.Printf("set timeout = %f seconds\n", timeout.Seconds())
 	diff(req)
+
+	// Or use req.Client
+	c = new(http.Client)
+	req = request.NewRequest(c)
+	req.Client.Timeout = timeout
+	fmt.Printf("set timeout = %f seconds\n", timeout.Seconds())
+	diff(req)
 }

@@ -175,8 +175,8 @@ func TestCookies(t *testing.T) {
 	defer resp.Body.Close()
 
 	v := map[string]interface{}{
-		"key":   "value",
-		"a": "123",
+		"key": "value",
+		"a":   "123",
 	}
 	assert.Equal(t, d.Get("cookies").MustMap(), v)
 }
@@ -312,47 +312,6 @@ func TestGzip(t *testing.T) {
 	assert.Equal(t, t2 != "", true)
 	assert.Equal(t, c2 != nil, true)
 	assert.Equal(t, d.Get("gzipped").MustBool(), true)
-}
-
-func currentIP(u string) (ip string) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	req.Proxy = u
-	url := "http://httpbin.org/get"
-	resp, _ := req.Get(url)
-	d, _ := resp.Json()
-	defer resp.Body.Close()
-
-	return d.Get("origin").MustString()
-}
-func currentIPHTTPS(u string) (ip string) {
-	c := &http.Client{}
-	a := NewArgs(c)
-	a.Proxy = u
-	url := "https://httpbin.org/get"
-	resp, _ := Get(url, a)
-	d, _ := resp.Json()
-	defer resp.Body.Close()
-
-	return d.Get("origin").MustString()
-}
-
-func TestProxy(t *testing.T) {
-	ip := currentIP("")
-	httpProxyURL := os.Getenv("http_proxy_url")
-	httpsProxyURL := os.Getenv("https_proxy_url")
-	socks5ProxyURL := os.Getenv("socks5_proxy_url")
-
-	if httpProxyURL != "" {
-		assert.Equal(t, currentIP(httpProxyURL) != ip, true)
-	}
-	if httpsProxyURL != "" {
-		assert.Equal(t, currentIP(httpsProxyURL) != ip, true)
-		assert.Equal(t, currentIPHTTPS(httpsProxyURL) != ip, true)
-	}
-	if socks5ProxyURL != "" {
-		assert.Equal(t, currentIP(socks5ProxyURL) != ip, true)
-	}
 }
 
 func TestBasicAuth(t *testing.T) {

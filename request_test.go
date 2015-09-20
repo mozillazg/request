@@ -1,13 +1,9 @@
 package request
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/url"
-	"os"
 	"testing"
 
 	"github.com/bitly/go-simplejson"
@@ -86,37 +82,6 @@ func TestGetParmas2(t *testing.T) {
 		})
 }
 
-func TestHead(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	url := "http://httpbin.org/get"
-	resp, _ := req.Head(url)
-	defer resp.Body.Close()
-
-	assert.Equal(t, resp.Ok(), true)
-}
-
-func TestPost(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	req.Data = map[string]string{
-		"a":   "A",
-		"foo": "bar",
-	}
-	url := "http://httpbin.org/post"
-	resp, _ := req.Post(url)
-	d, _ := resp.Json()
-	defer resp.Body.Close()
-
-	assert.Equal(t, resp.Ok(), true)
-	assert.Equal(t, d.Get("url").MustString(), url)
-	assert.Equal(t, d.Get("form").MustMap(),
-		map[string]interface{}{
-			"a":   "A",
-			"foo": "bar",
-		}, true)
-}
-
 func TestPut(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)
@@ -161,24 +126,6 @@ func TestOptions(t *testing.T) {
 	defer resp.Body.Close()
 
 	assert.Equal(t, resp.Ok(), true)
-}
-
-func TestCookies(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	req.Cookies = map[string]string{
-		"key": "value",
-		"a":   "123",
-	}
-	resp, _ := req.Get("http://httpbin.org/cookies")
-	d, _ := resp.Json()
-	defer resp.Body.Close()
-
-	v := map[string]interface{}{
-		"key": "value",
-		"a":   "123",
-	}
-	assert.Equal(t, d.Get("cookies").MustMap(), v)
 }
 
 func TestPostJson(t *testing.T) {
@@ -257,46 +204,6 @@ func TestPostJson3(t *testing.T) {
 	assert.Equal(t, j2.Get("json"), v)
 }
 
-func TestPostFiles(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	b := &bytes.Buffer{}
-	w := bufio.NewWriter(b)
-	f := []byte{
-		'a',
-		'b',
-		'c',
-		'd',
-	}
-	_, _ = w.Write(f)
-	w.Flush()
-	f2, _ := os.Open("test.txt")
-	defer f2.Close()
-	req.Data = map[string]string{
-		"key": "value",
-		"a":   "123",
-	}
-	req.Files = []FileField{
-		FileField{"abc", "abc.txt", b},
-		FileField{"test", "test.txt", f2},
-	}
-	url := "http://httpbin.org/post"
-	resp, _ := req.Post(url)
-	d, _ := resp.Json()
-	defer resp.Body.Close()
-
-	assert.Equal(t, resp.Ok(), true)
-	v := map[string]interface{}{
-		"key": "value",
-		"a":   "123",
-	}
-	assert.Equal(t, d.Get("form").MustMap(), v)
-	_, x := d.Get("files").CheckGet("abc")
-	assert.Equal(t, x, true)
-	_, x = d.Get("files").CheckGet("test")
-	assert.Equal(t, x, true)
-}
-
 func TestGzip(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)
@@ -329,63 +236,4 @@ func TestBasicAuth(t *testing.T) {
 	url = "http://httpbin.org/basic-auth/user2/passwd2"
 	resp, _ = req.Get(url)
 	assert.Equal(t, resp.OK(), true)
-}
-
-func TestResponseURL(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	url := "http://httpbin.org/get"
-	resp, _ := req.Get(url)
-	u, _ := resp.URL()
-	assert.Equal(t, u.String(), url)
-
-	url = "http://httpbin.org/redirect/3"
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
-	url = "http://httpbin.org/redirect/3"
-
-	c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		return errors.New("redirect")
-	}
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/2")
-
-}
-
-func TestCheckRedirect(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	url := "http://httpbin.org/get"
-	resp, _ := req.Get(url)
-	u, _ := resp.URL()
-	assert.Equal(t, u.String(), url)
-
-	url = "http://httpbin.org/redirect/3"
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
-
-	url = "http://httpbin.org/redirect/15"
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/4")
-
-	url = "http://httpbin.org/redirect/2"
-	req.Headers = map[string]string{
-		"Referer": "http://example.com",
-	}
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	referer := resp.Request.Header.Get("Referer")
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
-	assert.Equal(t, referer, "http://httpbin.org/relative-redirect/1")
-	assert.Equal(t, resp.Request.Header.Get("User-Agent"), defaultUserAgent)
-
-	url = "http://httpbin.org/redirect/12"
-	DefaultRedirectLimit = 16
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
 }

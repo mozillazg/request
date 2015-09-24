@@ -1,15 +1,12 @@
 // Go HTTP Requests for Humans™.
 //
-// HTTP Request is so easy:
-//
 // GET Request:
-//
 //
 // 	c := &http.Client{}
 // 	req := request.NewRequest(c)
 // 	resp, err := req.Get("http://httpbin.org/get")
+// 	defer resp.Body.Close()  // **Don't forget close the response body**
 // 	j, err := resp.Json()
-// 	defer resp.Body.Close()  // Don't forget close the response body
 //
 // POST Request:
 //
@@ -68,7 +65,8 @@
 //
 // Need more control?
 //
-// You can change req.Client like http.Client, for example: set timeout
+// You can setup req.Client(you know, it's an &http.Client),
+// for example: set timeout
 //
 // timeout := time.Duration(1 * time.Second)
 // req.Client.Timeout = timeout

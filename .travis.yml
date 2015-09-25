@@ -24,7 +24,7 @@ install:
 script:
   - echo "test.txtabc" > test.txt
   - go test -v
-  - $HOME/gopath/bin/goveralls -repotoken BB7TANeKBvI1vunBdOQSxseNkSQxDW2dz
+  - if [[ $TRAVIS_GO_VERSION != 'tip' ]]; then $HOME/gopath/bin/goveralls -service=travis-ci; fi
 
 matrix:
   allow_failures:

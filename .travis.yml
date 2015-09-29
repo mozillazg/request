@@ -1,8 +1,10 @@
 language: go
 go:
+  - 1.1
   - 1.2
   - 1.3
   - 1.4
+  - 1.5
   - tip
 
 sudo: false
@@ -21,4 +23,9 @@ install:
 
 script:
   - echo "test.txtabc" > test.txt
-  - $HOME/gopath/bin/goveralls -repotoken BB7TANeKBvI1vunBdOQSxseNkSQxDW2dz
+  - go test -v
+  - if [[ $TRAVIS_GO_VERSION != 'tip' ]]; then $HOME/gopath/bin/goveralls -service=travis-ci; fi
+
+matrix:
+  allow_failures:
+    - go: 1.1

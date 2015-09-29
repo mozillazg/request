@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2015-09-24)
+
+* Updated docs
+* Improve code
+* No API change, No bugfix
 
 ## 0.3.0 (2015-02-11)
 

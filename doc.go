@@ -60,7 +60,7 @@
 //	// form
 //	req.Body = strings.NewReader("a=1&b=2")
 //	req.Headers = map[string]string{
-//		"Content-Type": DefaultContentType,
+//		"Content-Type": request.DefaultContentType,
 //	}
 //	resp, err = req.Post("http://httpbin.org/post")
 //

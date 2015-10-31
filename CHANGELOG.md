@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0 (2015-10-31)
+
+### API Changes
+
+* `type Request struct` add `Body` field
+* Add new variables:
+  * `DefaultHeaders`
+  * `DefaultContentType`
+  * `DefaultJsonType`
+  * `DefaultRedirectLimit`
+  * `DefaultUserAgent`
+
 ## 0.3.1 (2015-09-24)
 
 * Updated docs

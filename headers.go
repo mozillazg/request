@@ -9,7 +9,11 @@ var DefaultHeaders = map[string]string{
 	"Accept":          "*/*",
 	"User-Agent":      DefaultUserAgent,
 }
+
+// Default Content-Type Header for form body
 var DefaultContentType = "application/x-www-form-urlencoded; charset=utf-8"
+
+// Default Content-Type Header for json body
 var DefaultJsonType = "application/json; charset=utf-8"
 
 func applyHeaders(a *Args, req *http.Request, contentType string) {

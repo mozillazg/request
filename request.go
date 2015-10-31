@@ -127,10 +127,6 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	}
 
 	s, err := a.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
 	resp = &Response{s, nil}
 	return
 }

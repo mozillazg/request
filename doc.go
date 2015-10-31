@@ -51,6 +51,19 @@
 //	req.Json = []int{1, 2, 3}
 //	resp, err = req.Post("http://httpbin.org/post")
 //
+// others body:
+//
+//	// not set Content-Type
+//	req.Body = strings.NewReader("<xml><a>abc</a></xml")
+//	resp, err := req.Post("http://httpbin.org/post")
+//
+//	// form
+//	req.Body = strings.NewReader("a=1&b=2")
+//	req.Headers = map[string]string{
+//		"Content-Type": DefaultContentType,
+//	}
+//	resp, err = req.Post("http://httpbin.org/post")
+//
 // Proxy:
 //
 //	req.Proxy = "http://127.0.0.1:8080"
@@ -62,11 +75,6 @@
 //
 //	req.BasicAuth = request.BasicAuth{"user", "passwd"}
 //	resp, err := req.Get("http://httpbin.org/basic-auth/user/passwd")
-//
-// Send raw body:
-//
-//	req.Body = strings.NewReader("<xml><a>abc</a></xml")
-//	resp, err := req.Post("http://httpbin.org/post")
 //
 // Need more control?
 //

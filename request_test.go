@@ -82,6 +82,18 @@ func TestGetParmas2(t *testing.T) {
 		})
 }
 
+func TestHead(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	url := "http://httpbin.org/get"
+	resp, _ := req.Head(url)
+	defer resp.Body.Close()
+
+	assert.Equal(t, resp.Ok(), true)
+	content, _ := resp.Content()
+	assert.Equal(t, content, []byte{})
+}
+
 func TestPut(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)

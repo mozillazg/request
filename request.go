@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-const Version = "0.3.1"
+const Version = "0.4.0"
 
 type FileField struct {
 	FieldName string
@@ -33,6 +33,7 @@ type Args struct {
 	Json      interface{}
 	Proxy     string
 	BasicAuth BasicAuth
+	Body      io.Reader
 }
 
 type Request struct {
@@ -50,7 +51,7 @@ func NewArgs(c *http.Client) *Args {
 
 	return &Args{
 		Client:    c,
-		Headers:   defaultHeaders,
+		Headers:   DefaultHeaders,
 		Cookies:   nil,
 		Data:      nil,
 		Params:    nil,
@@ -81,6 +82,10 @@ func newURL(u string, params map[string]string) string {
 }
 
 func newBody(a *Args) (body io.Reader, contentType string, err error) {
+	if a.Body != nil {
+		return a.Body, "", nil
+	}
+
 	if a.Data == nil && a.Files == nil && a.Json == nil {
 		return nil, "", nil
 	}
@@ -94,19 +99,27 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 	for k, v := range a.Data {
 		d.Set(k, v)
 	}
-	return strings.NewReader(d.Encode()), "", nil
+	return strings.NewReader(d.Encode()), DefaultContentType, nil
 }
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
 	body, contentType, err := newBody(a)
+	if err != nil {
+		return nil, err
+	}
+
 	u := newURL(url, a.Params)
 	req, err := http.NewRequest(method, u, body)
 	if err != nil {
 		return nil, err
 	}
+
 	applyHeaders(a, req, contentType)
 	applyCookies(a, req)
-	applyProxy(a)
+	err = applyProxy(a)
+	if err != nil {
+		return nil, err
+	}
 	applyCheckRdirect(a)
 
 	if a.BasicAuth.Username != "" {
@@ -241,5 +254,6 @@ func req2arg(req *Request) (a *Args) {
 		Json:      req.Json,
 		Proxy:     req.Proxy,
 		BasicAuth: req.BasicAuth,
+		Body:      req.Body,
 	}
 }

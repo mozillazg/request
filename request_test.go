@@ -82,6 +82,18 @@ func TestGetParmas2(t *testing.T) {
 		})
 }
 
+func TestHead(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	url := "http://httpbin.org/get"
+	resp, _ := req.Head(url)
+	defer resp.Body.Close()
+
+	assert.Equal(t, resp.Ok(), true)
+	content, _ := resp.Content()
+	assert.Equal(t, content, []byte{})
+}
+
 func TestPut(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)
@@ -227,6 +239,7 @@ func TestBasicAuth(t *testing.T) {
 	req.BasicAuth = BasicAuth{"user", "passwd"}
 	url := "http://httpbin.org/basic-auth/user/passwd"
 	resp, _ := req.Get(url)
+	defer resp.Body.Close()
 	assert.Equal(t, resp.OK(), true)
 
 	req.BasicAuth = BasicAuth{
@@ -235,5 +248,6 @@ func TestBasicAuth(t *testing.T) {
 	}
 	url = "http://httpbin.org/basic-auth/user2/passwd2"
 	resp, _ = req.Get(url)
+	defer resp.Body.Close()
 	assert.Equal(t, resp.OK(), true)
 }

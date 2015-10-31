@@ -34,7 +34,7 @@ func TestCheckRedirect(t *testing.T) {
 	referer := resp.Request.Header.Get("Referer")
 	assert.Equal(t, u.String(), "http://httpbin.org/get")
 	assert.Equal(t, referer, "http://httpbin.org/relative-redirect/1")
-	assert.Equal(t, resp.Request.Header.Get("User-Agent"), defaultUserAgent)
+	assert.Equal(t, resp.Request.Header.Get("User-Agent"), DefaultUserAgent)
 
 	url = "http://httpbin.org/redirect/12"
 	DefaultRedirectLimit = 16

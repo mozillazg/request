@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/bmizerany/assert"
@@ -69,4 +70,37 @@ func TestPostFiles(t *testing.T) {
 	assert.Equal(t, x, true)
 	_, x = d.Get("files").CheckGet("test")
 	assert.Equal(t, x, true)
+}
+
+func TestPostRawBody(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.Body = strings.NewReader("a=1&b=2")
+	req.Headers = map[string]string{
+		"Content-Type": DefaultContentType,
+	}
+	url := "http://httpbin.org/post"
+	resp, _ := req.Post(url)
+	defer resp.Body.Close()
+
+	j, _ := resp.Json()
+	assert.Equal(t, j.Get("form").MustMap(),
+		map[string]interface{}{
+			"a": "1",
+			"b": "2",
+		}, true)
+}
+
+func TestPostXML(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	xml := "<xml><a>abc</a></xml"
+	req.Body = strings.NewReader(xml)
+	url := "http://httpbin.org/post"
+	resp, _ := req.Post(url)
+	defer resp.Body.Close()
+
+	j, _ := resp.Json()
+	data, _ := j.Get("data").String()
+	assert.Equal(t, data, xml)
 }

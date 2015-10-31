@@ -2,19 +2,23 @@ package request
 
 import "net/http"
 
-var defaultUserAgent = "go-request/" + Version
-var defaultHeaders = map[string]string{
+var DefaultUserAgent = "go-request/" + Version
+var DefaultHeaders = map[string]string{
 	"Connection":      "keep-alive",
 	"Accept-Encoding": "gzip, deflate",
 	"Accept":          "*/*",
-	"User-Agent":      defaultUserAgent,
+	"User-Agent":      DefaultUserAgent,
 }
-var defaultContentType = "application/x-www-form-urlencoded; charset=utf-8"
-var defaultJsonType = "application/json; charset=utf-8"
+
+// Default Content-Type Header for form body
+var DefaultContentType = "application/x-www-form-urlencoded; charset=utf-8"
+
+// Default Content-Type Header for json body
+var DefaultJsonType = "application/json; charset=utf-8"
 
 func applyHeaders(a *Args, req *http.Request, contentType string) {
 	// apply defaultHeaders
-	for k, v := range defaultHeaders {
+	for k, v := range DefaultHeaders {
 		_, ok := a.Headers[k]
 		if !ok {
 			req.Header.Set(k, v)
@@ -29,8 +33,6 @@ func applyHeaders(a *Args, req *http.Request, contentType string) {
 	if !ok {
 		if contentType != "" {
 			req.Header.Set("Content-Type", contentType)
-		} else {
-			req.Header.Set("Content-Type", defaultContentType)
 		}
 	}
 }

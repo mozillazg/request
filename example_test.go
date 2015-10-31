@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/mozillazg/request"
 )
@@ -87,6 +88,18 @@ func ExamplePost_files() {
 	defer f.Close()
 	req.Files = []request.FileField{
 		request.FileField{"abc", "abc.txt", f},
+	}
+	url := "http://httpbin.org/post"
+	resp, _ := req.Post(url)
+	defer resp.Body.Close()
+}
+
+func ExamplePostRawBody() {
+	c := new(http.Client)
+	req := request.NewRequest(c)
+	req.Body = strings.NewReader("a=1&b=2&foo=bar")
+	req.Headers = map[string]string{
+		"Content-Type": request.DefaultContentType,
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.Post(url)

@@ -37,5 +37,5 @@ func newJsonBody(a *Args) (body io.Reader, contentType string, err error) {
 	if err != nil {
 		return nil, "", err
 	}
-	return bytes.NewReader(b), defaultJsonType, err
+	return bytes.NewReader(b), DefaultJsonType, err
 }

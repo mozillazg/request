@@ -63,12 +63,17 @@
 //	req.BasicAuth = request.BasicAuth{"user", "passwd"}
 //	resp, err := req.Get("http://httpbin.org/basic-auth/user/passwd")
 //
+// Send raw body:
+//
+//	req.Body = strings.NewReader("<xml><a>abc</a></xml")
+//	resp, err := req.Post("http://httpbin.org/post")
+//
 // Need more control?
 //
 // You can setup req.Client(you know, it's an &http.Client),
 // for example: set timeout
 //
-// timeout := time.Duration(1 * time.Second)
-// req.Client.Timeout = timeout
-// req.Get("http://httpbin.org/get")
+//	timeout := time.Duration(1 * time.Second)
+//	req.Client.Timeout = timeout
+//	req.Get("http://httpbin.org/get")
 package request

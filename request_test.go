@@ -227,6 +227,7 @@ func TestBasicAuth(t *testing.T) {
 	req.BasicAuth = BasicAuth{"user", "passwd"}
 	url := "http://httpbin.org/basic-auth/user/passwd"
 	resp, _ := req.Get(url)
+	defer resp.Body.Close()
 	assert.Equal(t, resp.OK(), true)
 
 	req.BasicAuth = BasicAuth{
@@ -235,5 +236,6 @@ func TestBasicAuth(t *testing.T) {
 	}
 	url = "http://httpbin.org/basic-auth/user2/passwd2"
 	resp, _ = req.Get(url)
+	defer resp.Body.Close()
 	assert.Equal(t, resp.OK(), true)
 }

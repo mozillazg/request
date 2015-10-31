@@ -21,7 +21,6 @@ func currentIP(u string) (ip string) {
 }
 
 func proxyHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", defaultContentType)
 	w.Write([]byte("{\"origin\": \"127.0.0.1\"}"))
 }
 

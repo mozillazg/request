@@ -90,7 +90,7 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 		return nil, "", nil
 	}
 	if a.Files != nil {
-		return newMultipartBody(a)
+		return newMultipartBody(a, nil)
 	} else if a.Json != nil {
 		return newJsonBody(a)
 	}
@@ -170,6 +170,36 @@ func Post(url string, a *Args) (resp *Response, err error) {
 // url can be string or *url.URL or ur.URL
 func (req *Request) Post(url interface{}) (resp *Response, err error) {
 	resp, err = Post(url2string(url), req2arg(req))
+	return
+}
+
+// url can be string or *url.URL or ur.URL
+// data can be io.Reader or string or map[string]string or map[string][]string
+func (req *Request) PostForm(url interface{}, data interface{}) (resp *Response, err error) {
+	args := req2arg(req)
+	contentType := ""
+
+	switch data.(type) {
+	case io.Reader:
+		req.Body = data.(io.Reader)
+	case string:
+		req.Body = strings.NewReader(data.(string))
+	case map[string]string, map[string][]string:
+		req.Body, contentType, err = newFormBody(args, data)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if contentType == "" {
+		_, ok := req.Headers["Content-Type"]
+		if !ok {
+			req.Headers["Content-Type"] = DefaultContentType
+		}
+	} else {
+		req.Headers["Content-Type"] = contentType
+	}
+	args = req2arg(req)
+	resp, err = Post(url2string(url), args)
 	return
 }
 

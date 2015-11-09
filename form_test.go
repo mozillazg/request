@@ -104,3 +104,80 @@ func TestPostXML(t *testing.T) {
 	data, _ := j.Get("data").String()
 	assert.Equal(t, data, xml)
 }
+
+func TestPostFormIO(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	body := strings.NewReader("a=1&b=2")
+	url := "http://httpbin.org/post"
+	resp, _ := req.PostForm(url, body)
+	defer resp.Body.Close()
+
+	j, _ := resp.Json()
+	assert.Equal(t, j.Get("form").MustMap(),
+		map[string]interface{}{
+			"a": "1",
+			"b": "2",
+		}, true)
+}
+
+func TestPostFormString(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	s := "a=1&b=2"
+	url := "http://httpbin.org/post"
+	resp, _ := req.PostForm(url, s)
+	defer resp.Body.Close()
+
+	j, _ := resp.Json()
+	assert.Equal(t, j.Get("form").MustMap(),
+		map[string]interface{}{
+			"a": "1",
+			"b": "2",
+		}, true)
+}
+
+func TestPostFormStructA(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	s := map[string]string{
+		"a": "1",
+		"b": "2",
+	}
+	url := "http://httpbin.org/post"
+	resp, _ := req.PostForm(url, s)
+	defer resp.Body.Close()
+
+	j, _ := resp.Json()
+	assert.Equal(t, j.Get("form").MustMap(),
+		map[string]interface{}{
+			"a": "1",
+			"b": "2",
+		}, true)
+}
+
+func TestPostFormStructB(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	s := map[string][]string{
+		"a": []string{"1", "2"},
+		"b": []string{"2", "3"},
+	}
+	url := "http://httpbin.org/post"
+	resp, _ := req.PostForm(url, s)
+	defer resp.Body.Close()
+
+	j, _ := resp.Json()
+	form := map[string][]string{}
+	for k, v := range j.Get("form").MustMap() {
+		switch v.(type) {
+		case []string:
+			form[k] = v.([]string)
+		}
+	}
+	assert.Equal(t, form,
+		map[string][]string{
+			"a": []string{"1", "2"},
+			"b": []string{"2", "3"},
+		}, true)
+}

@@ -48,10 +48,14 @@ func NewArgs(c *http.Client) *Args {
 		jar, _ := cookiejar.New(&options)
 		c.Jar = jar
 	}
+	headers := map[string]string{}
+	for k, v := range DefaultHeaders {
+		headers[k] = v
+	}
 
 	return &Args{
 		Client:    c,
-		Headers:   DefaultHeaders,
+		Headers:   headers,
 		Cookies:   nil,
 		Data:      nil,
 		Params:    nil,
@@ -190,6 +194,7 @@ func (req *Request) PostForm(url interface{}, data interface{}) (resp *Response,
 			return nil, err
 		}
 	}
+
 	if contentType == "" {
 		_, ok := req.Headers["Content-Type"]
 		if !ok {

@@ -197,7 +197,7 @@ func (req *Request) PostForm(url interface{}, data interface{}) (resp *Response,
 
 	if contentType == "" {
 		_, ok := req.Headers["Content-Type"]
-		if !ok {
+		if !ok && req.Files == nil {
 			req.Headers["Content-Type"] = DefaultContentType
 		}
 	} else {

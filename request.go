@@ -264,6 +264,23 @@ func (req *Request) Options(url interface{}) (resp *Response, err error) {
 	return
 }
 
+// Reset all fields to default values
+func (req *Request) Reset() {
+	req.Headers = map[string]string{}
+	for k, v := range DefaultHeaders {
+		req.Headers[k] = v
+	}
+	req.Cookies = nil
+	req.Data = nil
+	req.Params = nil
+	req.Files = nil
+	req.Json = nil
+	req.Proxy = ""
+	req.BasicAuth = BasicAuth{}
+	req.Body = nil
+	return
+}
+
 func url2string(u interface{}) string {
 	switch u.(type) {
 	case string:

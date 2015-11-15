@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-const Version = "0.4.0"
+const Version = "0.5.0"
 
 type FileField struct {
 	FieldName string
@@ -48,10 +48,14 @@ func NewArgs(c *http.Client) *Args {
 		jar, _ := cookiejar.New(&options)
 		c.Jar = jar
 	}
+	headers := map[string]string{}
+	for k, v := range DefaultHeaders {
+		headers[k] = v
+	}
 
 	return &Args{
 		Client:    c,
-		Headers:   DefaultHeaders,
+		Headers:   headers,
 		Cookies:   nil,
 		Data:      nil,
 		Params:    nil,
@@ -90,7 +94,7 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 		return nil, "", nil
 	}
 	if a.Files != nil {
-		return newMultipartBody(a)
+		return newMultipartBody(a, nil)
 	} else if a.Json != nil {
 		return newJsonBody(a)
 	}
@@ -173,6 +177,53 @@ func (req *Request) Post(url interface{}) (resp *Response, err error) {
 	return
 }
 
+// url can be string or *url.URL or ur.URL
+//
+// data can be map[string]string or map[string][]string or string or io.Reader
+//
+// 	data := map[string]string{
+// 		"a": "1",
+// 		"b": "2",
+// 	}
+//
+// 	data := map[string][]string{
+// 		"a": []string{"1", "2"},
+// 		"b": []string{"2", "3"},
+// 	}
+//
+// 	data : = "a=1&b=2"
+//
+// 	data : = strings.NewReader("a=1&b=2")
+//
+func (req *Request) PostForm(url interface{}, data interface{}) (resp *Response, err error) {
+	args := req2arg(req)
+	contentType := ""
+
+	switch data.(type) {
+	case io.Reader:
+		req.Body = data.(io.Reader)
+	case string:
+		req.Body = strings.NewReader(data.(string))
+	case map[string]string, map[string][]string:
+		req.Body, contentType, err = newFormBody(args, data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if contentType == "" {
+		_, ok := req.Headers["Content-Type"]
+		if !ok && req.Files == nil {
+			req.Headers["Content-Type"] = DefaultContentType
+		}
+	} else {
+		req.Headers["Content-Type"] = contentType
+	}
+	args = req2arg(req)
+	resp, err = Post(url2string(url), args)
+	return
+}
+
 // Put issues a PUT to the specified URL.
 //
 // Caller should close resp.Body when done reading from it.
@@ -226,6 +277,23 @@ func Options(url string, a *Args) (resp *Response, err error) {
 // url can be string or *url.URL or ur.URL
 func (req *Request) Options(url interface{}) (resp *Response, err error) {
 	resp, err = Options(url2string(url), req2arg(req))
+	return
+}
+
+// Reset all fields to default values
+func (req *Request) Reset() {
+	req.Headers = map[string]string{}
+	for k, v := range DefaultHeaders {
+		req.Headers[k] = v
+	}
+	req.Cookies = nil
+	req.Data = nil
+	req.Params = nil
+	req.Files = nil
+	req.Json = nil
+	req.Proxy = ""
+	req.BasicAuth = BasicAuth{}
+	req.Body = nil
 	return
 }
 

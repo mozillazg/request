@@ -251,3 +251,14 @@ func TestBasicAuth(t *testing.T) {
 	defer resp.Body.Close()
 	assert.Equal(t, resp.OK(), true)
 }
+
+func TestReset(t *testing.T) {
+	c := new(http.Client)
+	req := NewRequest(c)
+	req.BasicAuth = BasicAuth{"user", "passwd"}
+	url := "http://httpbin.org"
+	req.Get(url)
+
+	req.Reset()
+	assert.Equal(t, req.BasicAuth, BasicAuth{})
+}

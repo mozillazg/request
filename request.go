@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-const Version = "0.4.0"
+const Version = "0.5.0"
 
 type FileField struct {
 	FieldName string
@@ -178,7 +178,23 @@ func (req *Request) Post(url interface{}) (resp *Response, err error) {
 }
 
 // url can be string or *url.URL or ur.URL
-// data can be io.Reader or string or map[string]string or map[string][]string
+//
+// data can be map[string]string or map[string][]string or string or io.Reader
+//
+// 	data := map[string]string{
+// 		"a": "1",
+// 		"b": "2",
+// 	}
+//
+// 	data := map[string][]string{
+// 		"a": []string{"1", "2"},
+// 		"b": []string{"2", "3"},
+// 	}
+//
+// 	data : = "a=1&b=2"
+//
+// 	data : = strings.NewReader("a=1&b=2")
+//
 func (req *Request) PostForm(url interface{}, data interface{}) (resp *Response, err error) {
 	args := req2arg(req)
 	contentType := ""

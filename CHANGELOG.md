@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 0.5.0 (2015-11-15)
+
+### API Changes
+
+* Add `func (req *Request) PostForm(url interface{}, data interface{}) (resp *Response, err error)`
+* Add `func (req *Request) Reset()`
+
+
 ## 0.4.0 (2015-10-31)
 
 ### API Changes

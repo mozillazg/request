@@ -46,7 +46,7 @@ func TestPostFiles(t *testing.T) {
 	}
 	_, _ = w.Write(f)
 	w.Flush()
-	f2, _ := os.Open("test.txt")
+	f2, _ := os.Open("doc.go")
 	defer f2.Close()
 	req.Data = map[string]string{
 		"key": "value",

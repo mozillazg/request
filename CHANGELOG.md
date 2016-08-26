@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 0.5.2 (2016-08-27)
+
+* remove vendor/, use glide instead
+
+
 ## 0.5.1 (2016-06-05)
 
 * add vendor/

@@ -9,7 +9,7 @@ import (
 	"github.com/mozillazg/request"
 )
 
-func ExampleGet() {
+func ExampleRequest_Get() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	url := "http://httpbin.org/get"
@@ -23,7 +23,7 @@ func ExampleGet() {
 	//http://httpbin.org/get
 }
 
-func ExampleGet_params() {
+func ExampleRequest_Get_params() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	req.Params = map[string]string{
@@ -39,7 +39,7 @@ func ExampleGet_params() {
 	//http://httpbin.org/get?a=1&b=2
 }
 
-func ExampleGet_customHeaders() {
+func ExampleRequest_Get_customHeaders() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	req.Headers = map[string]string{
@@ -57,7 +57,7 @@ func ExampleGet_customHeaders() {
 	//abc
 }
 
-func ExamplePost() {
+func ExampleRequest_Post() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	req.Data = map[string]string{
@@ -69,7 +69,7 @@ func ExamplePost() {
 	defer resp.Body.Close()
 }
 
-func ExampleGet_cookies() {
+func ExampleRequest_Get_cookies() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	req.Cookies = map[string]string{
@@ -81,20 +81,20 @@ func ExampleGet_cookies() {
 	defer resp.Body.Close()
 }
 
-func ExamplePost_files() {
+func ExampleRequest_Post_files() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	f, _ := os.Open("test.txt")
 	defer f.Close()
 	req.Files = []request.FileField{
-		request.FileField{"abc", "abc.txt", f},
+		{"abc", "abc.txt", f},
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.Post(url)
 	defer resp.Body.Close()
 }
 
-func ExamplePostRawBody() {
+func ExampleRequest_Post_rawBody() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
 	req.Body = strings.NewReader("a=1&b=2&foo=bar")

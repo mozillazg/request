@@ -53,8 +53,8 @@ func TestPostFiles(t *testing.T) {
 		"a":   "123",
 	}
 	req.Files = []FileField{
-		FileField{"abc", "abc.txt", b},
-		FileField{"test", "test.txt", f2},
+		{"abc", "abc.txt", b},
+		{"test", "test.txt", f2},
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.Post(url)
@@ -161,8 +161,8 @@ func TestPostFormStructB(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)
 	s := map[string][]string{
-		"a": []string{"1", "2"},
-		"b": []string{"2", "3"},
+		"a": {"1", "2"},
+		"b": {"2", "3"},
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.PostForm(url, s)
@@ -182,8 +182,8 @@ func TestPostFormStructB(t *testing.T) {
 	}
 	assert.Equal(t, form,
 		map[string][]string{
-			"a": []string{"1", "2"},
-			"b": []string{"2", "3"},
+			"a": {"1", "2"},
+			"b": {"2", "3"},
 		}, true)
 }
 
@@ -201,7 +201,7 @@ func TestPostFormFileA(t *testing.T) {
 		"a":   "123",
 	}
 	req.Files = []FileField{
-		FileField{"abc", "abc.txt", b},
+		{"abc", "abc.txt", b},
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.PostForm(url, nil)
@@ -231,7 +231,7 @@ func TestPostFormFileB(t *testing.T) {
 		"a":   "123",
 	}
 	req.Files = []FileField{
-		FileField{"abc", "abc.txt", b},
+		{"abc", "abc.txt", b},
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.PostForm(url, data)

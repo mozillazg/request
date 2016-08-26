@@ -14,15 +14,15 @@ before_install:
   - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
-  - go get github.com/tools/godep
+  - curl https://glide.sh/get | sh
 
 install:
-  - godep restore
+  - glide install
   - go build
 
 script:
-  - go test -v
-  - if [[ $TRAVIS_GO_VERSION != 'tip' ]]; then $HOME/gopath/bin/goveralls -service=travis-ci; fi
+  - make test
+  - if [[ $TRAVIS_GO_VERSION != 'tip' ]]; then $HOME/gopath/bin/goveralls -service=travis-ci -ignore=vendor/; fi
 
 matrix:
   allow_failures:

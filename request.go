@@ -12,6 +12,9 @@ import (
 
 const Version = "0.5.1"
 
+// DefaultClient for NewArgs and NewRequest
+var DefaultClient = new(http.Client)
+
 type FileField struct {
 	FieldName string
 	FileName  string
@@ -41,6 +44,9 @@ type Request struct {
 }
 
 func NewArgs(c *http.Client) *Args {
+	if c == nil {
+		c = DefaultClient
+	}
 	if c.Jar == nil {
 		options := cookiejar.Options{
 			PublicSuffixList: publicsuffix.List,
@@ -107,6 +113,9 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 }
 
 func newRequest(method string, url string, a *Args) (resp *Response, err error) {
+	if a == nil {
+		a = NewArgs(DefaultClient)
+	}
 	body, contentType, err := newBody(a)
 	if err != nil {
 		return nil, err

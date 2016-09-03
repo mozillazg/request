@@ -41,7 +41,7 @@ func TestGet(t *testing.T) {
 
 }
 
-func TestGetParmas(t *testing.T) {
+func TestGetParams(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)
 	req.Params = map[string]string{
@@ -61,7 +61,7 @@ func TestGetParmas(t *testing.T) {
 		})
 }
 
-func TestGetParmas2(t *testing.T) {
+func TestGetParams2(t *testing.T) {
 	c := new(http.Client)
 	req := NewRequest(c)
 	req.Params = map[string]string{
@@ -261,4 +261,30 @@ func TestReset(t *testing.T) {
 
 	req.Reset()
 	assert.Equal(t, req.BasicAuth, BasicAuth{})
+}
+
+func TestGetArgsNilA(t *testing.T) {
+	url := "http://httpbin.org/get"
+	resp, _ := Get(url, nil)
+	defer resp.Body.Close()
+
+	assert.Equal(t, resp.Ok(), true)
+}
+
+func TestGetArgsNilB(t *testing.T) {
+	args := NewArgs(nil)
+	url := "http://httpbin.org/get"
+	resp, _ := Get(url, args)
+	defer resp.Body.Close()
+
+	assert.Equal(t, resp.Ok(), true)
+}
+
+func TestGetArgsNilC(t *testing.T) {
+	req := NewRequest(nil)
+	url := "http://httpbin.org/get"
+	resp, _ := req.Get(url)
+	defer resp.Body.Close()
+
+	assert.Equal(t, resp.Ok(), true)
 }

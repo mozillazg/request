@@ -23,6 +23,20 @@ func ExampleRequest_Get() {
 	//http://httpbin.org/get
 }
 
+func ExampleGet() {
+	c := new(http.Client)
+	args := request.NewArgs(c)
+	url := "http://httpbin.org/get"
+	resp, _ := request.Get(url, args)
+	d, _ := resp.Json()
+	defer resp.Body.Close()
+	fmt.Println(resp.Ok())
+	fmt.Println(d.Get("url").MustString())
+	// Output:
+	//true
+	//http://httpbin.org/get
+}
+
 func ExampleRequest_Get_params() {
 	c := new(http.Client)
 	req := request.NewRequest(c)
@@ -66,6 +80,18 @@ func ExampleRequest_Post() {
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.Post(url)
+	defer resp.Body.Close()
+}
+
+func ExamplePost() {
+	c := new(http.Client)
+	args := request.NewArgs(c)
+	args.Data = map[string]string{
+		"a": "1",
+		"b": "2",
+	}
+	url := "http://httpbin.org/post"
+	resp, _ := request.Post(url, args)
 	defer resp.Body.Close()
 }
 

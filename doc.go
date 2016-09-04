@@ -1,4 +1,4 @@
-// Go HTTP Requests for Humans™.
+// Package request is a developer-friendly HTTP request library for Gopher.
 //
 // GET Request:
 //
@@ -10,6 +10,7 @@
 //
 // POST Request:
 //
+// 	req = request.NewRequest(c)
 //	req.Data = map[string]string{
 //		"key": "value",
 //		"a":   "123",
@@ -18,6 +19,7 @@
 //
 // Custom Cookies:
 //
+// 	req = request.NewRequest(c)
 //	req.Cookies = map[string]string{
 //		"key": "value",
 //		"a":   "123",
@@ -27,6 +29,7 @@
 //
 // Custom Headers:
 //
+// 	req = request.NewRequest(c)
 //	req.Headers = map[string]string{
 //		"Accept-Encoding": "gzip,deflate,sdch",
 //		"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -35,6 +38,7 @@
 //
 // Upload Files:
 //
+// 	req = request.NewRequest(c)
 //	f, err := os.Open("test.txt")
 //	req.Files = []request.FileField{
 //		request.FileField{"file", "test.txt", f},
@@ -43,6 +47,7 @@
 //
 // Json Body:
 //
+// 	req = request.NewRequest(c)
 //	req.Json = map[string]string{
 //		"a": "A",
 //		"b": "B",
@@ -53,11 +58,13 @@
 //
 // others body:
 //
+// 	req = request.NewRequest(c)
 //	// not set Content-Type
 //	req.Body = strings.NewReader("<xml><a>abc</a></xml")
 //	resp, err := req.Post("http://httpbin.org/post")
 //
 //	// form
+// 	req = request.NewRequest(c)
 //	req.Body = strings.NewReader("a=1&b=2")
 //	req.Headers = map[string]string{
 //		"Content-Type": request.DefaultContentType,
@@ -66,6 +73,7 @@
 //
 // Proxy:
 //
+// 	req = request.NewRequest(c)
 //	req.Proxy = "http://127.0.0.1:8080"
 //	// req.Proxy = "https://127.0.0.1:8080"
 //	// req.Proxy = "socks5://127.0.0.1:57341"
@@ -73,6 +81,7 @@
 //
 // HTTP Basic Authentication:
 //
+// 	req = request.NewRequest(c)
 //	req.BasicAuth = request.BasicAuth{"user", "passwd"}
 //	resp, err := req.Get("http://httpbin.org/basic-auth/user/passwd")
 //

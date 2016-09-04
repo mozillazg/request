@@ -6,6 +6,7 @@ go:
   - 1.4
   - 1.5
   - 1.6
+  - 1.7
   - tip
 
 sudo: false
@@ -15,15 +16,27 @@ before_install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get github.com/tools/godep
+  - curl https://glide.sh/get | sh
 
 install:
-  - godep restore
+  - |
+    version=${TRAVIS_GO_VERSION:0:3} && \
+    if [[ "$version" == "1.1" \
+       || "$version" == "1.2" \
+       || "$version" == "1.3" \
+       || "$version" == "1.4" \
+       || "$version" == "1.5" ]]; then
+       godep restore
+    else
+      glide install
+    fi
   - go build
 
 script:
-  - go test -v
-  - if [[ $TRAVIS_GO_VERSION != 'tip' ]]; then $HOME/gopath/bin/goveralls -service=travis-ci; fi
+  - make test
+  - if [[ $TRAVIS_GO_VERSION != 'tip' ]]; then $HOME/gopath/bin/goveralls -service=travis-ci -ignore=vendor/; fi
 
 matrix:
   allow_failures:
     - go: 1.1
+    - go: tip

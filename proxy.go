@@ -25,7 +25,7 @@ func applyProxy(a *Args) (err error) {
 		a.Client.Transport = &http.Transport{
 			Proxy: http.ProxyURL(u),
 			Dial: (&net.Dialer{
-				Timeout: 30 * time.Second,
+				Timeout:   30 * time.Second,
 				KeepAlive: 30 * time.Second,
 			}).Dial,
 			TLSHandshakeTimeout: 10 * time.Second,
@@ -36,8 +36,8 @@ func applyProxy(a *Args) (err error) {
 			return err
 		}
 		a.Client.Transport = &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
-			Dial:  dialer.Dial,
+			Proxy:               http.ProxyFromEnvironment,
+			Dial:                dialer.Dial,
 			TLSHandshakeTimeout: 10 * time.Second,
 		}
 	}

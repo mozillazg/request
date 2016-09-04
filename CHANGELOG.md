@@ -1,8 +1,21 @@
 # Changelog
 
+
+## 0.6.0 (2016-09-04)
+
+* Remove vendor/, use glide instead
+
+### API Changes
+
+* Add `var DefaultClient = new(http.Client)`
+* Support `NewArgs(nil)`
+* Support `NewRequest(nil)`
+* Support `GET(url, nil), POST(url, nil), ...`
+
+
 ## 0.5.1 (2016-06-05)
 
-* add vendor/
+* Add vendor/
 
 
 ## 0.5.0 (2015-11-15)

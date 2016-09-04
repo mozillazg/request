@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// DefaultRedirectLimit define max redirect counts
 var DefaultRedirectLimit = 10
 
 func defaultCheckRedirect(req *http.Request, via []*http.Request) error {

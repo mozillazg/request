@@ -1,4 +1,4 @@
-// Go HTTP Requests for Humans™.
+// Package request is a developer-friendly HTTP request library for Gopher.
 //
 // GET Request:
 //

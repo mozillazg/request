@@ -4,7 +4,7 @@ request
 [![Coverage Status](https://coveralls.io/repos/mozillazg/request/badge.png?branch=master)](https://coveralls.io/r/mozillazg/request?branch=master)
 [![GoDoc](https://godoc.org/github.com/mozillazg/request?status.svg)](https://godoc.org/github.com/mozillazg/request)
 
-Go HTTP Requests for Humans™. Inspired by [Python-Requests](https://github.com/kennethreitz/requests).
+A developer-friendly HTTP request library for Gopher. Inspired by [Python-Requests](https://github.com/kennethreitz/requests).
 
 
 Installation
@@ -114,3 +114,9 @@ req = request.NewRequest(c)
 req.BasicAuth = request.BasicAuth{"user", "passwd"}
 resp, err := req.Get("http://httpbin.org/basic-auth/user/passwd")
 ```
+
+
+License
+---------
+
+Under the MIT License.

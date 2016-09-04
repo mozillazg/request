@@ -10,22 +10,26 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+// Version export version
 const Version = "0.5.1"
 
 // DefaultClient for NewArgs and NewRequest
 var DefaultClient = new(http.Client)
 
+// FileField struct for upload file
 type FileField struct {
 	FieldName string
 	FileName  string
 	File      io.Reader
 }
 
+// BasicAuth struct for http basic auth
 type BasicAuth struct {
 	Username string
 	Password string
 }
 
+// Args for request args
 type Args struct {
 	Client    *http.Client
 	Headers   map[string]string
@@ -39,10 +43,12 @@ type Args struct {
 	Body      io.Reader
 }
 
+// Request is alias Args
 type Request struct {
 	*Args
 }
 
+// NewArgs return a *Args
 func NewArgs(c *http.Client) *Args {
 	if c == nil {
 		c = DefaultClient
@@ -72,6 +78,7 @@ func NewArgs(c *http.Client) *Args {
 	}
 }
 
+// NewRequest return a *Request
 func NewRequest(c *http.Client) *Request {
 	return &Request{NewArgs(c)}
 }
@@ -102,7 +109,7 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 	if a.Files != nil {
 		return newMultipartBody(a, nil)
 	} else if a.Json != nil {
-		return newJsonBody(a)
+		return newJSONBody(a)
 	}
 
 	d := url.Values{}
@@ -152,6 +159,8 @@ func Get(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Get issues a GET to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Get(url interface{}) (resp *Response, err error) {
 	resp, err = Get(url2string(url), req2arg(req))
@@ -166,6 +175,8 @@ func Head(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Head issues a HEAD to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Head(url interface{}) (resp *Response, err error) {
 	resp, err = Head(url2string(url), req2arg(req))
@@ -180,12 +191,16 @@ func Post(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Post issues a POST to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Post(url interface{}) (resp *Response, err error) {
 	resp, err = Post(url2string(url), req2arg(req))
 	return
 }
 
+// PostForm send post form request.
+//
 // url can be string or *url.URL or ur.URL
 //
 // data can be map[string]string or map[string][]string or string or io.Reader
@@ -241,6 +256,8 @@ func Put(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Put issues a PUT to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Put(url interface{}) (resp *Response, err error) {
 	resp, err = Put(url2string(url), req2arg(req))
@@ -255,6 +272,8 @@ func Patch(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Patch issues a PATCH to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Patch(url interface{}) (resp *Response, err error) {
 	resp, err = Patch(url2string(url), req2arg(req))
@@ -269,6 +288,8 @@ func Delete(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Delete issues a DELETE to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Delete(url interface{}) (resp *Response, err error) {
 	resp, err = Delete(url2string(url), req2arg(req))
@@ -283,6 +304,8 @@ func Options(url string, a *Args) (resp *Response, err error) {
 	return
 }
 
+// Options issues a OPTIONS to the specified URL.
+//
 // url can be string or *url.URL or ur.URL
 func (req *Request) Options(url interface{}) (resp *Response, err error) {
 	resp, err = Options(url2string(url), req2arg(req))

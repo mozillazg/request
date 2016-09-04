@@ -41,7 +41,7 @@ func newMultipartBody(a *Args, vs url.Values) (body io.Reader, contentType strin
 	return
 }
 
-func newJsonBody(a *Args) (body io.Reader, contentType string, err error) {
+func newJSONBody(a *Args) (body io.Reader, contentType string, err error) {
 	b, err := json.Marshal(a.Json)
 	if err != nil {
 		return nil, "", err

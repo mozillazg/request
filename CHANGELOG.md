@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 0.6.0 (2016-mm-dd)
+## 0.6.0 (2016-09-04)
 
 * Remove vendor/, use glide instead
 

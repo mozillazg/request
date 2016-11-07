@@ -1,6 +1,7 @@
 package request
 
 import (
+	"compress/flate"
 	"compress/gzip"
 	"io"
 	"io/ioutil"
@@ -34,20 +35,23 @@ func (resp *Response) Content() (b []byte, err error) {
 	var reader io.ReadCloser
 	switch resp.Header.Get("Content-Encoding") {
 	case "gzip":
-		reader, err := gzip.NewReader(resp.Body)
-		if err != nil {
+		if reader, err = gzip.NewReader(resp.Body); err != nil {
 			return nil, err
 		}
-		b, err = ioutil.ReadAll(reader)
+
+		defer reader.Close()
+	case "deflate":
+		reader = flate.NewReader(resp.Body)
+
 		defer reader.Close()
 	default:
 		reader = resp.Body
-		b, err = ioutil.ReadAll(reader)
 	}
 
-	if err != nil {
+	if b, err = ioutil.ReadAll(reader); err != nil {
 		return nil, err
 	}
+
 	resp.content = b
 	return b, err
 }

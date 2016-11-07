@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 0.7.0 (2016-11-07)
+
+* Add auto decompress deflated body (via [#23][#23]. thanks [@DavidCai1993][@DavidCai1993])
+
+
 ## 0.6.0 (2016-09-04)
 
 * Remove vendor/, use glide instead
@@ -76,3 +81,6 @@
 ## 0.1.0 (2015-01-08)
 
 * Initial Release
+
+[#23]: https://github.com/mozillazg/request/pull/23
+[@DavidCai1993]: https://github.com/DavidCai1993

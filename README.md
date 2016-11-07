@@ -2,6 +2,7 @@ request
 =======
 [![Build Status](https://travis-ci.org/mozillazg/request.svg?branch=master)](https://travis-ci.org/mozillazg/request)
 [![Coverage Status](https://coveralls.io/repos/mozillazg/request/badge.png?branch=master)](https://coveralls.io/r/mozillazg/request?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mozillazg/request)](https://goreportcard.com/report/github.com/mozillazg/request)
 [![GoDoc](https://godoc.org/github.com/mozillazg/request?status.svg)](https://godoc.org/github.com/mozillazg/request)
 
 A developer-friendly HTTP request library for Gopher. Inspired by [Python-Requests](https://github.com/kennethreitz/requests).

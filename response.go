@@ -1,8 +1,8 @@
 package request
 
 import (
-	"compress/flate"
 	"compress/gzip"
+	"compress/zlib"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -38,16 +38,15 @@ func (resp *Response) Content() (b []byte, err error) {
 		if reader, err = gzip.NewReader(resp.Body); err != nil {
 			return nil, err
 		}
-
-		defer reader.Close()
 	case "deflate":
-		reader = flate.NewReader(resp.Body)
-
-		defer reader.Close()
+		if reader, err = zlib.NewReader(resp.Body); err != nil {
+			return nil, err
+		}
 	default:
 		reader = resp.Body
 	}
 
+	defer reader.Close()
 	if b, err = ioutil.ReadAll(reader); err != nil {
 		return nil, err
 	}

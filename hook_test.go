@@ -7,10 +7,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bmizerany/assert"
 	"io/ioutil"
-	"strings"
-	"time"
+
+	"github.com/bmizerany/assert"
 )
 
 type hookNothing struct {
@@ -40,15 +39,14 @@ func TestHookNothing(t *testing.T) {
 	assert.Equal(t, h.callAfterHook, true)
 }
 
-func TestHookNothingTimeout(t *testing.T) {
+func TestHookNothingError(t *testing.T) {
 	h := &hookNothing{}
 
 	c := &http.Client{}
 	req := NewRequest(c)
 	req.Hooks = []Hook{h}
-	req.Client.Timeout = time.Duration(1 * time.Microsecond)
-	_, err := req.Get("https://httpbin.org/get")
-	assert.Equal(t, strings.Contains(err.Error(), "Client.Timeout exceede"), true)
+	_, err := req.Get("http://127.0.0.1:12345/get")
+	assert.Equal(t, err != nil, true)
 }
 
 type beforeRequestHookError struct {

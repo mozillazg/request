@@ -1,46 +1,74 @@
 package request
 
 import (
-	"net/http"
+	"errors"
 	"testing"
 
 	"github.com/bmizerany/assert"
+	"net/http"
 )
 
-func TestCheckRedirect(t *testing.T) {
-	c := new(http.Client)
-	req := NewRequest(c)
-	url := "http://httpbin.org/get"
+func TestCheckRedirectNoRedirect(t *testing.T) {
+	req := NewRequest(nil)
+	url := "https://httpbin.org/get"
 	resp, _ := req.Get(url)
 	u, _ := resp.URL()
 	assert.Equal(t, u.String(), url)
+}
 
-	url = "http://httpbin.org/redirect/3"
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
+func TestCheckRedirectNumberLessThanDefault(t *testing.T) {
+	req := NewRequest(nil)
+	url := "https://httpbin.org/redirect/3"
+	resp, _ := req.Get(url)
+	u, _ := resp.URL()
+	assert.Equal(t, u.String(), "https://httpbin.org/get")
+}
 
-	// FIXME: for go 1.7.1
-	// url = "http://httpbin.org/redirect/15"
-	// resp, _ = req.Get(url)
-	// _ = "breakpoint"
-	// u, _ = resp.URL()
-	// assert.Equal(t, u.String(), "http://httpbin.org/relative-redirect/4")
+func TestCheckRedirectNumberGreatThanDefault(t *testing.T) {
+	req := NewRequest(nil)
+	url := "https://httpbin.org/redirect/15"
+	resp, err := req.Get(url)
+	u, _ := resp.URL()
+	assert.NotEqual(t, err, nil)
+	assert.Equal(t, u.String(), "https://httpbin.org/relative-redirect/4")
+}
 
-	url = "http://httpbin.org/redirect/2"
+func TestCheckRedirectWithHeaders(t *testing.T) {
+	req := NewRequest(nil)
+	url := "https://httpbin.org/redirect/2"
 	req.Headers = map[string]string{
 		"Referer": "http://example.com",
+		"X-Test":  "test",
 	}
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	referer := resp.Request.Header.Get("Referer")
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
-	assert.Equal(t, referer, "http://httpbin.org/relative-redirect/1")
+	resp, _ := req.Get(url)
+	u, _ := resp.URL()
+	assert.Equal(t, u.String(), "https://httpbin.org/get")
+	assert.Equal(t, resp.Request.Header.Get("X-Test"), req.Headers["X-Test"])
+	assert.Equal(t, resp.Request.Header.Get("Referer") != req.Headers["Referer"], true)
 	assert.Equal(t, resp.Request.Header.Get("User-Agent"), DefaultUserAgent)
+}
 
-	url = "http://httpbin.org/redirect/12"
+func TestCheckRedirectCustom(t *testing.T) {
+	url := "https://httpbin.org/redirect/12"
+	req := NewRequest(nil)
+	req.Client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) > 16 {
+			return errors.New("redirect")
+		}
+		return nil
+	}
+	resp, _ := req.Get(url)
+	u, _ := resp.URL()
+	assert.Equal(t, u.String(), "https://httpbin.org/get")
+}
+
+func TestCheckRedirectChangeDefaultLimit(t *testing.T) {
+	url := "https://httpbin.org/redirect/12"
+	req := NewRequest(nil)
+	origin := DefaultRedirectLimit
 	DefaultRedirectLimit = 16
-	resp, _ = req.Get(url)
-	u, _ = resp.URL()
-	assert.Equal(t, u.String(), "http://httpbin.org/get")
+	resp, _ := req.Get(url)
+	u, _ := resp.URL()
+	assert.Equal(t, u.String(), "https://httpbin.org/get")
+	DefaultRedirectLimit = origin
 }

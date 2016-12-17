@@ -4,6 +4,7 @@
 ## 0.8.0 (2016-mm-dd)
 
 * Add `Request.Hooks` for supports before and after request hooks (via #26)
+* Add `var ErrMaxRedirect = errors.New("Exceeded max redirects")`
 
 
 ## 0.7.0 (2016-11-07)

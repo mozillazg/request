@@ -29,7 +29,7 @@ func TestCheckRedirectNumberGreatThanDefault(t *testing.T) {
 	url := "https://httpbin.org/redirect/15"
 	resp, err := req.Get(url)
 	u, _ := resp.URL()
-	assert.NotEqual(t, err, nil)
+	assert.NotEqual(t, err, ErrMaxRedirect)
 	assert.Equal(t, u.String(), "https://httpbin.org/relative-redirect/4")
 }
 

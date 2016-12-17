@@ -1,19 +1,18 @@
 package request
 
 import (
-	"fmt"
 	"net/http"
+	"errors"
 )
 
 // DefaultRedirectLimit define max redirect counts
 var DefaultRedirectLimit = 10
-
-// TODO
-// const MaxRedirectLimitError = errors.New("")
+// ErrMaxRedirect when redirect times great than DefaultRedirectLimit will return this error
+var ErrMaxRedirect = errors.New("Exceeded max redirects")
 
 func defaultCheckRedirect(req *http.Request, via []*http.Request) error {
 	if len(via) > DefaultRedirectLimit {
-		return fmt.Errorf("stopped after %d redirects", len(via))
+		return ErrMaxRedirect
 	}
 	if len(via) == 0 {
 		return nil

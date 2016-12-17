@@ -172,11 +172,9 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	newResp, newErr := applyAfterReqHooks(req, s, err, a.Hooks)
 	if newErr != nil {
 		err = newErr
-		return nil, err
-	} else if newResp != nil {
+	}
+	if newResp != nil {
 		s = newResp
-	} else if err != nil {
-		return nil, err
 	}
 
 	resp = &Response{s, nil}

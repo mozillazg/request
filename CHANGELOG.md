@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 0.8.0 (2016-mm-dd)
+
+* Add `Request.Hooks` for supports before and after request hooks (via #26)
+
+
 ## 0.7.0 (2016-11-07)
 
 * Add auto decompress deflated body (via [#23][#23]. thanks [@DavidCai1993][@DavidCai1993])
@@ -84,3 +89,4 @@
 
 [#23]: https://github.com/mozillazg/request/pull/23
 [@DavidCai1993]: https://github.com/DavidCai1993
+[#26]: https://github.com/mozillazg/request/pull/26

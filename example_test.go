@@ -113,7 +113,7 @@ func ExampleRequest_Post_files() {
 	f, _ := os.Open("test.txt")
 	defer f.Close()
 	req.Files = []request.FileField{
-		{"abc", "abc.txt", f},
+		{FieldName: "abc", FileName: "abc.txt", File: f},
 	}
 	url := "http://httpbin.org/post"
 	resp, _ := req.Post(url)

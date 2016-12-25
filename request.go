@@ -11,7 +11,7 @@ import (
 )
 
 // Version export version
-const Version = "0.7.0"
+const Version = "0.8.0"
 
 // DefaultClient for NewArgs and NewRequest
 var DefaultClient = new(http.Client)
@@ -41,6 +41,7 @@ type Args struct {
 	Proxy     string
 	BasicAuth BasicAuth
 	Body      io.Reader
+	Hooks     []Hook
 }
 
 // Request is alias Args
@@ -75,6 +76,8 @@ func NewArgs(c *http.Client) *Args {
 		Json:      nil,
 		Proxy:     "",
 		BasicAuth: BasicAuth{},
+		Body:      nil,
+		Hooks:     []Hook{},
 	}
 }
 
@@ -119,17 +122,14 @@ func newBody(a *Args) (body io.Reader, contentType string, err error) {
 	return strings.NewReader(d.Encode()), DefaultContentType, nil
 }
 
-func newRequest(method string, url string, a *Args) (resp *Response, err error) {
-	if a == nil {
-		a = NewArgs(DefaultClient)
-	}
+func buildHTTPRequest(method string, url string, a *Args) (req *http.Request, err error) {
 	body, contentType, err := newBody(a)
 	if err != nil {
 		return nil, err
 	}
 
 	u := newURL(url, a.Params)
-	req, err := http.NewRequest(method, u, body)
+	req, err = http.NewRequest(method, u, body)
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +145,38 @@ func newRequest(method string, url string, a *Args) (resp *Response, err error) 
 	if a.BasicAuth.Username != "" {
 		req.SetBasicAuth(a.BasicAuth.Username, a.BasicAuth.Password)
 	}
+	return
+}
 
-	s, err := a.Client.Do(req)
+func newRequest(method string, url string, a *Args) (resp *Response, err error) {
+	if a == nil {
+		a = NewArgs(DefaultClient)
+	}
+	req, err := buildHTTPRequest(method, url, a)
+	if err != nil {
+		return nil, err
+	}
+
+	// apply BeforeRequest hook
+	s, err := applyBeforeReqHooks(req, a.Hooks)
+	if err != nil {
+		return nil, err
+	} else if s != nil {
+		resp = &Response{s, nil}
+		return resp, err
+	}
+
+	s, err = a.Client.Do(req)
+
+	// apply AfterRequest hook
+	newResp, newErr := applyAfterReqHooks(req, s, err, a.Hooks)
+	if newErr != nil {
+		err = newErr
+	}
+	if newResp != nil {
+		s = newResp
+	}
+
 	resp = &Response{s, nil}
 	return
 }
@@ -355,5 +385,6 @@ func req2arg(req *Request) (a *Args) {
 		Proxy:     req.Proxy,
 		BasicAuth: req.BasicAuth,
 		Body:      req.Body,
+		Hooks:     req.Hooks,
 	}
 }

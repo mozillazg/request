@@ -28,7 +28,7 @@ Usage
 
 ```go
 import (
-	"github.com/mozillazg/request"
+    "github.com/mozillazg/request"
 )
 ```
 
@@ -45,10 +45,10 @@ defer resp.Body.Close()  // Don't forget close the response body
 **POST**:
 
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 req.Data = map[string]string{
-	"key": "value",
-	"a":   "123",
+    "key": "value",
+    "a":   "123",
 }
 resp, err := req.Post("http://httpbin.org/post")
 ```
@@ -56,10 +56,10 @@ resp, err := req.Post("http://httpbin.org/post")
 **Cookies**:
 
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 req.Cookies = map[string]string{
-	"key": "value",
-	"a":   "123",
+    "key": "value",
+    "a":   "123",
 }
 resp, err := req.Get("http://httpbin.org/cookies")
 ```
@@ -67,10 +67,10 @@ resp, err := req.Get("http://httpbin.org/cookies")
 **Headers**:
 
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 req.Headers = map[string]string{
-	"Accept-Encoding": "gzip,deflate,sdch",
-	"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Encoding": "gzip,deflate,sdch",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 }
 resp, err := req.Get("http://httpbin.org/get")
 ```
@@ -78,10 +78,10 @@ resp, err := req.Get("http://httpbin.org/get")
 **Files**:
 
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 f, err := os.Open("test.txt")
 req.Files = []request.FileField{
-	request.FileField{"file", "test.txt", f},
+    request.FileField{"file", "test.txt", f},
 }
 resp, err := req.Post("http://httpbin.org/post")
 ```
@@ -89,10 +89,10 @@ resp, err := req.Post("http://httpbin.org/post")
 **Json**:
 
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 req.Json = map[string]string{
-	"a": "A",
-	"b": "B",
+    "a": "A",
+    "b": "B",
 }
 resp, err := req.Post("http://httpbin.org/post")
 req.Json = []int{1, 2, 3}
@@ -101,7 +101,7 @@ resp, err = req.Post("http://httpbin.org/post")
 
 **Proxy**:
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 req.Proxy = "http://127.0.0.1:8080"
 // req.Proxy = "https://127.0.0.1:8080"
 // req.Proxy = "socks5://127.0.0.1:57341"
@@ -111,7 +111,7 @@ or https://github.com/mozillazg/request/tree/develop/_example/proxy
 
 **HTTP Basic Authentication**:
 ```go
-req = request.NewRequest(c)
+req := request.NewRequest(c)
 req.BasicAuth = request.BasicAuth{"user", "passwd"}
 resp, err := req.Get("http://httpbin.org/basic-auth/user/passwd")
 ```
